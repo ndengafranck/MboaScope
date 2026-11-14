@@ -8,7 +8,7 @@ Six developers, one repo, one contract. Each developer works with their own AI a
 | --- | --- | --- | --- | --- |
 | Lead and integration | Yann | yannx8 | `feature/lead-` | `docs/prompts/lead.md` |
 | Data engineering | Firmin | Firminfire | `feature/data-` | `docs/prompts/data.md` |
-| Geospatial processing | Theophile | excellenttheophile | `feature/processing-` | `docs/prompts/processing.md` |
+| Geospatial processing | Theophile | excellenttheophile4-byte | `feature/processing-` | `docs/prompts/processing.md` |
 | Scientific analysis | Bako | yannsamir22 | `feature/analytics-` | `docs/prompts/analytics.md` |
 | AI engineering | Franck | ndengafranck | `feature/ai-` | `docs/prompts/ai.md` |
 | Frontend | Pavel | Paveljuniorr | `feature/frontend-` | `docs/prompts/frontend.md` |

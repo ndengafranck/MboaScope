@@ -15,7 +15,7 @@
 | 7 | Pages deployed | PASS | https://yannx8.github.io/MboaScope/ serves the app and data/*.json (HTTP 200) |
 | 9 | 26 issues, numbers match TEAM.md section 4 | PASS | #21 creation hit a network timeout; #21-#26 were edited and recreated so titles match the table |
 | 9 | project board | UNRESOLVED | token lacks `project` scope; manual steps given to the Lead |
-| 10 | collaborators | PARTIAL | yannsamir22 and Firminfire are collaborators; invitations pending for ndengafranck and Paveljuniorr (an earlier invite to the misspelled ndengafrank was cancelled); `excellenttheophile` does not exist on GitHub, invite not sent |
+| 10 | collaborators | PARTIAL | yannsamir22 and Firminfire are collaborators; invitations pending for ndengafranck and Paveljuniorr (an earlier invite to the misspelled ndengafrank was cancelled); invitation pending for excellenttheophile4-byte |
 | 10 | branch protection on main | PASS | PR required, status check `ci`, no force-push, no deletion, 0 approvals |
 | 11 | secrets scan | PASS | `git grep -i "api_key\|password"` shows variable names only |
 | 11 | make setup | PARTIAL | steps run individually (venv, pip install, npm ci/install); pip needed a longer timeout on this network |
