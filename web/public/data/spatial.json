@@ -1,0 +1,580 @@
+{
+  "contract_version": "1.0",
+  "generated_at": "2026-11-14T14:54:05Z",
+  "is_mock": true,
+  "exploratory": true,
+  "available": true,
+  "n_cells": 81,
+  "alpha": 0.05,
+  "expected_false_positives": 4.05,
+  "n_significant": 0,
+  "cells": [
+    {
+      "lat": 3.65,
+      "lon": 9.35,
+      "mean_annual_mm": 3770,
+      "sen_slope_mm_per_year": 16.8,
+      "p": 0.097
+    },
+    {
+      "lat": 3.65,
+      "lon": 9.45,
+      "mean_annual_mm": 3559,
+      "sen_slope_mm_per_year": 15.3,
+      "p": 0.088
+    },
+    {
+      "lat": 3.65,
+      "lon": 9.55,
+      "mean_annual_mm": 3830,
+      "sen_slope_mm_per_year": 20.1,
+      "p": 0.059
+    },
+    {
+      "lat": 3.65,
+      "lon": 9.65,
+      "mean_annual_mm": 3715,
+      "sen_slope_mm_per_year": 15.5,
+      "p": 0.059
+    },
+    {
+      "lat": 3.65,
+      "lon": 9.75,
+      "mean_annual_mm": 3721,
+      "sen_slope_mm_per_year": 19.4,
+      "p": 0.065
+    },
+    {
+      "lat": 3.65,
+      "lon": 9.85,
+      "mean_annual_mm": 3573,
+      "sen_slope_mm_per_year": 14.0,
+      "p": 0.183
+    },
+    {
+      "lat": 3.65,
+      "lon": 9.95,
+      "mean_annual_mm": 3702,
+      "sen_slope_mm_per_year": 17.8,
+      "p": 0.072
+    },
+    {
+      "lat": 3.65,
+      "lon": 10.05,
+      "mean_annual_mm": 3654,
+      "sen_slope_mm_per_year": 17.2,
+      "p": 0.154
+    },
+    {
+      "lat": 3.65,
+      "lon": 10.15,
+      "mean_annual_mm": 3730,
+      "sen_slope_mm_per_year": 14.6,
+      "p": 0.183
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.35,
+      "mean_annual_mm": 3667,
+      "sen_slope_mm_per_year": 18.3,
+      "p": 0.107
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.45,
+      "mean_annual_mm": 3618,
+      "sen_slope_mm_per_year": 16.6,
+      "p": 0.08
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.55,
+      "mean_annual_mm": 3771,
+      "sen_slope_mm_per_year": 20.1,
+      "p": 0.118
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.65,
+      "mean_annual_mm": 3669,
+      "sen_slope_mm_per_year": 14.4,
+      "p": 0.141
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.75,
+      "mean_annual_mm": 3731,
+      "sen_slope_mm_per_year": 14.4,
+      "p": 0.141
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.85,
+      "mean_annual_mm": 3764,
+      "sen_slope_mm_per_year": 16.2,
+      "p": 0.118
+    },
+    {
+      "lat": 3.75,
+      "lon": 9.95,
+      "mean_annual_mm": 3802,
+      "sen_slope_mm_per_year": 19.9,
+      "p": 0.072
+    },
+    {
+      "lat": 3.75,
+      "lon": 10.05,
+      "mean_annual_mm": 3680,
+      "sen_slope_mm_per_year": 16.1,
+      "p": 0.118
+    },
+    {
+      "lat": 3.75,
+      "lon": 10.15,
+      "mean_annual_mm": 3685,
+      "sen_slope_mm_per_year": 14.7,
+      "p": 0.107
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.35,
+      "mean_annual_mm": 3643,
+      "sen_slope_mm_per_year": 13.8,
+      "p": 0.168
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.45,
+      "mean_annual_mm": 3768,
+      "sen_slope_mm_per_year": 16.9,
+      "p": 0.154
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.55,
+      "mean_annual_mm": 3665,
+      "sen_slope_mm_per_year": 16.3,
+      "p": 0.141
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.65,
+      "mean_annual_mm": 3706,
+      "sen_slope_mm_per_year": 14.0,
+      "p": 0.168
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.75,
+      "mean_annual_mm": 3703,
+      "sen_slope_mm_per_year": 18.1,
+      "p": 0.08
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.85,
+      "mean_annual_mm": 3575,
+      "sen_slope_mm_per_year": 19.1,
+      "p": 0.08
+    },
+    {
+      "lat": 3.85,
+      "lon": 9.95,
+      "mean_annual_mm": 3678,
+      "sen_slope_mm_per_year": 15.2,
+      "p": 0.107
+    },
+    {
+      "lat": 3.85,
+      "lon": 10.05,
+      "mean_annual_mm": 3683,
+      "sen_slope_mm_per_year": 16.8,
+      "p": 0.183
+    },
+    {
+      "lat": 3.85,
+      "lon": 10.15,
+      "mean_annual_mm": 3753,
+      "sen_slope_mm_per_year": 15.2,
+      "p": 0.183
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.35,
+      "mean_annual_mm": 3807,
+      "sen_slope_mm_per_year": 11.6,
+      "p": 0.252
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.45,
+      "mean_annual_mm": 3753,
+      "sen_slope_mm_per_year": 16.9,
+      "p": 0.059
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.55,
+      "mean_annual_mm": 3644,
+      "sen_slope_mm_per_year": 16.4,
+      "p": 0.129
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.65,
+      "mean_annual_mm": 3715,
+      "sen_slope_mm_per_year": 16.6,
+      "p": 0.154
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.75,
+      "mean_annual_mm": 3553,
+      "sen_slope_mm_per_year": 16.5,
+      "p": 0.08
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.85,
+      "mean_annual_mm": 3674,
+      "sen_slope_mm_per_year": 14.6,
+      "p": 0.141
+    },
+    {
+      "lat": 3.95,
+      "lon": 9.95,
+      "mean_annual_mm": 3686,
+      "sen_slope_mm_per_year": 12.9,
+      "p": 0.234
+    },
+    {
+      "lat": 3.95,
+      "lon": 10.05,
+      "mean_annual_mm": 3710,
+      "sen_slope_mm_per_year": 16.1,
+      "p": 0.129
+    },
+    {
+      "lat": 3.95,
+      "lon": 10.15,
+      "mean_annual_mm": 3677,
+      "sen_slope_mm_per_year": 14.6,
+      "p": 0.199
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.35,
+      "mean_annual_mm": 3755,
+      "sen_slope_mm_per_year": 18.3,
+      "p": 0.107
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.45,
+      "mean_annual_mm": 3747,
+      "sen_slope_mm_per_year": 12.7,
+      "p": 0.154
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.55,
+      "mean_annual_mm": 3594,
+      "sen_slope_mm_per_year": 12.8,
+      "p": 0.252
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.65,
+      "mean_annual_mm": 3709,
+      "sen_slope_mm_per_year": 15.5,
+      "p": 0.118
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.75,
+      "mean_annual_mm": 3868,
+      "sen_slope_mm_per_year": 20.5,
+      "p": 0.097
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.85,
+      "mean_annual_mm": 3857,
+      "sen_slope_mm_per_year": 17.2,
+      "p": 0.154
+    },
+    {
+      "lat": 4.05,
+      "lon": 9.95,
+      "mean_annual_mm": 3785,
+      "sen_slope_mm_per_year": 14.0,
+      "p": 0.168
+    },
+    {
+      "lat": 4.05,
+      "lon": 10.05,
+      "mean_annual_mm": 3977,
+      "sen_slope_mm_per_year": 15.6,
+      "p": 0.216
+    },
+    {
+      "lat": 4.05,
+      "lon": 10.15,
+      "mean_annual_mm": 3663,
+      "sen_slope_mm_per_year": 16.3,
+      "p": 0.129
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.35,
+      "mean_annual_mm": 3710,
+      "sen_slope_mm_per_year": 13.0,
+      "p": 0.168
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.45,
+      "mean_annual_mm": 3860,
+      "sen_slope_mm_per_year": 17.1,
+      "p": 0.141
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.55,
+      "mean_annual_mm": 3751,
+      "sen_slope_mm_per_year": 14.9,
+      "p": 0.183
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.65,
+      "mean_annual_mm": 3842,
+      "sen_slope_mm_per_year": 14.4,
+      "p": 0.107
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.75,
+      "mean_annual_mm": 3735,
+      "sen_slope_mm_per_year": 11.9,
+      "p": 0.154
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.85,
+      "mean_annual_mm": 3562,
+      "sen_slope_mm_per_year": 14.5,
+      "p": 0.234
+    },
+    {
+      "lat": 4.15,
+      "lon": 9.95,
+      "mean_annual_mm": 3846,
+      "sen_slope_mm_per_year": 14.4,
+      "p": 0.141
+    },
+    {
+      "lat": 4.15,
+      "lon": 10.05,
+      "mean_annual_mm": 3712,
+      "sen_slope_mm_per_year": 18.5,
+      "p": 0.072
+    },
+    {
+      "lat": 4.15,
+      "lon": 10.15,
+      "mean_annual_mm": 3795,
+      "sen_slope_mm_per_year": 12.9,
+      "p": 0.183
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.35,
+      "mean_annual_mm": 3860,
+      "sen_slope_mm_per_year": 13.9,
+      "p": 0.252
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.45,
+      "mean_annual_mm": 3926,
+      "sen_slope_mm_per_year": 18.3,
+      "p": 0.107
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.55,
+      "mean_annual_mm": 3865,
+      "sen_slope_mm_per_year": 14.8,
+      "p": 0.168
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.65,
+      "mean_annual_mm": 3859,
+      "sen_slope_mm_per_year": 18.1,
+      "p": 0.183
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.75,
+      "mean_annual_mm": 3733,
+      "sen_slope_mm_per_year": 16.7,
+      "p": 0.129
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.85,
+      "mean_annual_mm": 3764,
+      "sen_slope_mm_per_year": 15.0,
+      "p": 0.141
+    },
+    {
+      "lat": 4.25,
+      "lon": 9.95,
+      "mean_annual_mm": 3769,
+      "sen_slope_mm_per_year": 15.4,
+      "p": 0.141
+    },
+    {
+      "lat": 4.25,
+      "lon": 10.05,
+      "mean_annual_mm": 3752,
+      "sen_slope_mm_per_year": 16.5,
+      "p": 0.08
+    },
+    {
+      "lat": 4.25,
+      "lon": 10.15,
+      "mean_annual_mm": 3827,
+      "sen_slope_mm_per_year": 16.4,
+      "p": 0.129
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.35,
+      "mean_annual_mm": 3864,
+      "sen_slope_mm_per_year": 18.6,
+      "p": 0.053
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.45,
+      "mean_annual_mm": 3894,
+      "sen_slope_mm_per_year": 16.5,
+      "p": 0.097
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.55,
+      "mean_annual_mm": 3930,
+      "sen_slope_mm_per_year": 18.2,
+      "p": 0.118
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.65,
+      "mean_annual_mm": 3764,
+      "sen_slope_mm_per_year": 18.1,
+      "p": 0.129
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.75,
+      "mean_annual_mm": 3751,
+      "sen_slope_mm_per_year": 16.0,
+      "p": 0.08
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.85,
+      "mean_annual_mm": 3863,
+      "sen_slope_mm_per_year": 16.7,
+      "p": 0.154
+    },
+    {
+      "lat": 4.35,
+      "lon": 9.95,
+      "mean_annual_mm": 3771,
+      "sen_slope_mm_per_year": 17.7,
+      "p": 0.129
+    },
+    {
+      "lat": 4.35,
+      "lon": 10.05,
+      "mean_annual_mm": 3762,
+      "sen_slope_mm_per_year": 15.6,
+      "p": 0.088
+    },
+    {
+      "lat": 4.35,
+      "lon": 10.15,
+      "mean_annual_mm": 3698,
+      "sen_slope_mm_per_year": 14.2,
+      "p": 0.088
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.35,
+      "mean_annual_mm": 3750,
+      "sen_slope_mm_per_year": 13.5,
+      "p": 0.129
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.45,
+      "mean_annual_mm": 3867,
+      "sen_slope_mm_per_year": 15.8,
+      "p": 0.118
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.55,
+      "mean_annual_mm": 3802,
+      "sen_slope_mm_per_year": 17.7,
+      "p": 0.129
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.65,
+      "mean_annual_mm": 3940,
+      "sen_slope_mm_per_year": 17.4,
+      "p": 0.107
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.75,
+      "mean_annual_mm": 3809,
+      "sen_slope_mm_per_year": 19.1,
+      "p": 0.097
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.85,
+      "mean_annual_mm": 3901,
+      "sen_slope_mm_per_year": 17.5,
+      "p": 0.107
+    },
+    {
+      "lat": 4.45,
+      "lon": 9.95,
+      "mean_annual_mm": 3814,
+      "sen_slope_mm_per_year": 16.9,
+      "p": 0.129
+    },
+    {
+      "lat": 4.45,
+      "lon": 10.05,
+      "mean_annual_mm": 3774,
+      "sen_slope_mm_per_year": 16.7,
+      "p": 0.072
+    },
+    {
+      "lat": 4.45,
+      "lon": 10.15,
+      "mean_annual_mm": 3949,
+      "sen_slope_mm_per_year": 18.0,
+      "p": 0.107
+    }
+  ]
+}

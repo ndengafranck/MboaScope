@@ -1,0 +1,17 @@
+{
+  "contract_version": "1.0",
+  "generated_at": "2026-11-14T14:54:06Z",
+  "is_mock": true,
+  "source": "template",
+  "model": null,
+  "checks_passed": true,
+  "summary": "For 2001-2025, the satellite record over the Douala box shows no statistically significant trend. The estimated change is 14.4 mm per year (95% CI -4.1 to 37.9).",
+  "what_it_means": "The Mann-Kendall test was used on 25 annual totals. The estimated change is 3.9% per decade relative to the mean annual total of 3724 mm.",
+  "what_it_does_not_mean": "This result says nothing about why rainfall behaves this way. It says nothing about future years. A result that is not significant is not evidence that rainfall stayed the same. The value is an average over an area, not a reading at one point.",
+  "limitations": [
+    "The satellite constellation changed in 2014 (TRMM to GPM), which can create artifacts that look like a trend.",
+    "IMERG has lower skill near the coast, and Douala sits on the Wouri estuary.",
+    "With 25 annual values the test has low statistical power.",
+    "The numbers are a satellite estimate averaged over a box of about 33 km, not a local reading."
+  ]
+}

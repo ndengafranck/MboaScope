@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "spatial.json",
+  "type": "object",
+  "required": ["contract_version", "generated_at", "is_mock", "exploratory", "available", "n_cells", "alpha", "expected_false_positives", "n_significant", "cells"],
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "generated_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"},
+    "is_mock": {"type": "boolean"},
+    "exploratory": {"const": true},
+    "available": {"type": "boolean"},
+    "n_cells": {"type": "integer", "minimum": 0},
+    "alpha": {"type": "number"},
+    "expected_false_positives": {"type": "number", "minimum": 0},
+    "n_significant": {"type": "integer", "minimum": 0},
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["lat", "lon", "mean_annual_mm", "sen_slope_mm_per_year", "p"],
+        "additionalProperties": false,
+        "properties": {
+          "lat": {"type": "number"},
+          "lon": {"type": "number"},
+          "mean_annual_mm": {"type": "number"},
+          "sen_slope_mm_per_year": {"type": "number"},
+          "p": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    }
+  },
+  "if": {"properties": {"available": {"const": false}}},
+  "then": {"properties": {"cells": {"maxItems": 0}}}
+}
