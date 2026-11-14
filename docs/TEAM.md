@@ -10,7 +10,7 @@ Six developers, one repo, one contract. Each developer works with their own AI a
 | Data engineering | Firmin | Firminfire | `feature/data-` | `docs/prompts/data.md` |
 | Geospatial processing | Theophile | excellenttheophile | `feature/processing-` | `docs/prompts/processing.md` |
 | Scientific analysis | Bako | yannsamir22 | `feature/analytics-` | `docs/prompts/analytics.md` |
-| AI engineering | Franck | ndengafrank | `feature/ai-` | `docs/prompts/ai.md` |
+| AI engineering | Franck | ndengafranck | `feature/ai-` | `docs/prompts/ai.md` |
 | Frontend | Pavel | Paveljuniorr | `feature/frontend-` | `docs/prompts/frontend.md` |
 
 Pick roles by strongest skill at kickoff. If the team is five, Data and Processing merge into one person. Whoever planned to do "backend" takes Data or Processing: there is no backend.
