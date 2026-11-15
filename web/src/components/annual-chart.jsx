@@ -134,7 +134,7 @@ function ChartBody({ annual, h }) {
           <span className="key-gap" aria-hidden="true" />
           <span>{excluded.length > 0 ? content.chartExcluded(excluded.join(', ')) : content.chartNoExcluded}</span>
         </p>
-        <p className="sr-only">{alt}</p>
+        <p className="chart-alt">{alt}</p>
       </figcaption>
       <details className="chart-data">
         <summary>{content.chartTableToggle}</summary>

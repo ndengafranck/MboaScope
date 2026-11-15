@@ -1,104 +1,69 @@
-/* MboaScope. Data-dashboard style (UI UX Pro Max: "Data-Dense Dashboard",
-   Fira Sans + Fira Code). Mobile first, tested at 360 px. Light and dark mode
-   from the system setting. Hue carries meaning only: brown drier, blue wetter,
-   purple the 2014 satellite change, red the mock warning. */
+/* MboaScope. Warm, Cameroon-inspired data page: cream paper, flag green and
+   gold, an Ndop-cloth pattern in the hero and footer. Outfit + Nunito Sans,
+   Fira Code for figures. Mobile first, tested at 360 px. In the data, hue
+   carries meaning only: brown drier, blue wetter, purple the 2014 change. */
 
 :root {
-  --bg: #f4f6f9;
-  --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --surface-3: #eef2f7;
-  --border: #e3e8ef;
-  --border-strong: #cdd5df;
-  --text: #0e1726;
-  --text-2: #3d4a5c;
-  --text-3: #5b6778;
-  --hover: rgba(14, 23, 38, 0.05);
-  --grid: #e3e8ef;
+  /* Warm Cameroon palette: cream paper, flag green and gold for the interface.
+     Data colours keep their meaning: earth brown drier, Ndop indigo wetter. */
+  --bg: #fbf6ec;
+  --surface: #fffdf8;
+  --surface-2: #fbf6ec;
+  --surface-3: #f3ebdc;
+  --border: #ebe1cf;
+  --border-strong: #d9ccb5;
+  --text: #1c2b23;
+  --text-2: #3f4b42;
+  --text-3: #5f6a5f;
+  --hover: rgba(10, 106, 74, 0.06);
+  --grid: #ebe1cf;
 
-  --brand: #1d5c96;
+  --brand: #0a6a4a;
   --brand-ink: #ffffff;
-  --brand-soft: #e7f0f9;
+  --brand-soft: #e3f1e9;
+  --sun: #f2b31b;
+  --sun-soft: #fdf1d2;
+  --flag-green: #007a5e;
+  --flag-red: #ce1126;
+  --flag-yellow: #fcd116;
 
-  --wetter: #1d5c96;
-  --wetter-soft: #e7f0f9;
+  --wetter: #1f4f8f;
+  --wetter-soft: #e5edf8;
   --drier: #8a4810;
-  --drier-soft: #f8eee3;
-  --neutral: #475569;
-  --neutral-soft: #eef2f7;
+  --drier-soft: #f8ebdc;
+  --neutral: #4d5a50;
+  --neutral-soft: #eee8dc;
 
-  --bar-top: #7fa3c8;
-  --bar-bottom: #b9cde2;
-  --trend: #0e1726;
-  --marker: #7e2a8a;
-  --marker-soft: #f5e9f7;
-  --alert: #b42318;
-  --alert-soft: #fdecea;
-  --warn: #8a5300;
-  --warn-soft: #fdf3e1;
+  --bar-top: #3f74b5;
+  --bar-bottom: #a9c3e3;
+  --trend: #1c2b23;
+  --marker: #8b2c8f;
+  --marker-soft: #f6e9f5;
+  --alert: #b3141f;
+  --alert-soft: #fdebec;
+  --warn: #8a5600;
+  --warn-soft: #fdf1d2;
 
-  --hero-1: #0b1f3a;
-  --hero-2: #12345c;
-  --hero-text: #f2f6fb;
-  --hero-text-2: #b9c8dc;
+  --hero-1: #0b3d2c;
+  --hero-2: #0f5a40;
+  --hero-text: #fffaf0;
+  --hero-text-2: #cfe3d6;
 
-  --radius: 14px;
-  --radius-sm: 8px;
-  --shadow-sm: 0 1px 2px rgba(14, 23, 38, 0.06);
-  --shadow: 0 1px 2px rgba(14, 23, 38, 0.05), 0 8px 24px -12px rgba(14, 23, 38, 0.12);
-  --shadow-lg: 0 2px 4px rgba(14, 23, 38, 0.06), 0 24px 48px -20px rgba(14, 23, 38, 0.28);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow-sm: 0 1px 2px rgba(60, 40, 10, 0.06);
+  --shadow: 0 1px 2px rgba(60, 40, 10, 0.05), 0 12px 32px -18px rgba(60, 40, 10, 0.22);
+  --shadow-lg: 0 2px 6px rgba(60, 40, 10, 0.06), 0 30px 60px -28px rgba(11, 61, 44, 0.45);
 
-  --sans: 'Fira Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --display: 'Outfit', 'Nunito Sans', system-ui, sans-serif;
+  --sans: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --bar-h: 60px;
+  --ndop: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23fffaf0' stroke-opacity='0.08' stroke-width='1.6'%3E%3Cpath d='M32 4 60 32 32 60 4 32Z'/%3E%3Cpath d='M32 16 48 32 32 48 16 32Z'/%3E%3Ccircle cx='32' cy='32' r='3'/%3E%3Cpath d='M0 0 10 10M64 0 54 10M0 64 10 54M64 64 54 54'/%3E%3C/g%3E%3C/svg%3E");
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0a111c;
-    --surface: #111a27;
-    --surface-2: #142030;
-    --surface-3: #1a2738;
-    --border: #233246;
-    --border-strong: #31435b;
-    --text: #e8eef6;
-    --text-2: #b6c3d4;
-    --text-3: #93a2b6;
-    --hover: rgba(232, 238, 246, 0.06);
-    --grid: #223044;
-
-    --brand: #6aa6e0;
-    --brand-ink: #0a111c;
-    --brand-soft: #16304b;
-
-    --wetter: #79b2ea;
-    --wetter-soft: #15304b;
-    --drier: #e0a066;
-    --drier-soft: #3a2614;
-    --neutral: #aab6c6;
-    --neutral-soft: #1d2939;
-
-    --bar-top: #4f7aa6;
-    --bar-bottom: #2b4560;
-    --trend: #f2f6fb;
-    --marker: #d58be0;
-    --marker-soft: #33203a;
-    --alert: #f2675b;
-    --alert-soft: #3b1714;
-    --warn: #f0b75c;
-    --warn-soft: #3a2a10;
-
-    --hero-1: #060d18;
-    --hero-2: #0e2440;
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.4), 0 24px 48px -20px rgba(0, 0, 0, 0.8);
-    color-scheme: dark;
-  }
-}
 
 /* Base */
 *,
@@ -116,6 +81,8 @@ html {
 body {
   margin: 0;
   background: var(--bg);
+  background-image: radial-gradient(rgba(138, 72, 16, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
   color: var(--text);
   font: 400 16px/1.6 var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -127,6 +94,17 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+h1,
+h2,
+h3,
+.logo-text,
+.footer-brand,
+.verdict,
+.kpi-value,
+.big-number {
+  font-family: var(--display);
 }
 
 a {
@@ -242,11 +220,37 @@ a:hover {
 }
 
 /* App bar */
+.flag-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 4px;
+}
+
+.flag-strip span:nth-child(1) {
+  background: var(--flag-green);
+}
+
+.flag-strip span:nth-child(2) {
+  position: relative;
+  background: var(--flag-red);
+}
+
+.flag-strip span:nth-child(2) svg {
+  position: absolute;
+  left: 50%;
+  top: -2.5px;
+  transform: translateX(-50%);
+}
+
+.flag-strip span:nth-child(3) {
+  background: var(--flag-yellow);
+}
+
 .topbar {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: saturate(1.6) blur(12px);
   -webkit-backdrop-filter: saturate(1.6) blur(12px);
   border-bottom: 1px solid var(--border);
@@ -274,8 +278,8 @@ a:hover {
 
 .logo-text {
   font-weight: 700;
-  font-size: 17px;
-  letter-spacing: -0.01em;
+  font-size: 19px;
+  letter-spacing: -0.02em;
 }
 
 .nav {
@@ -314,9 +318,9 @@ a:hover {
 }
 
 .nav a.is-active {
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-weight: 600;
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-weight: 700;
 }
 
 .icon-btn {
@@ -392,52 +396,108 @@ a:hover {
   position: relative;
   overflow: hidden;
   color: var(--hero-text);
-  background: linear-gradient(160deg, var(--hero-1) 0%, var(--hero-2) 100%);
+  background: linear-gradient(165deg, var(--hero-1) 0%, var(--hero-2) 100%);
 }
 
 .hero-bg {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(600px 300px at 85% 10%, rgba(106, 166, 224, 0.28), transparent 70%),
-    radial-gradient(500px 260px at 0% 100%, rgba(224, 160, 102, 0.16), transparent 70%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 48px),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 48px);
+    radial-gradient(420px 420px at 88% 8%, rgba(242, 179, 27, 0.42), rgba(242, 179, 27, 0.12) 40%, transparent 70%),
+    radial-gradient(520px 300px at 0% 30%, rgba(127, 179, 224, 0.16), transparent 70%),
+    var(--ndop);
   pointer-events: none;
 }
 
 .hero-inner {
   position: relative;
-  padding-top: 40px;
-  padding-bottom: 96px;
+  z-index: 1;
+  padding-top: 36px;
+  padding-bottom: 120px;
+}
+
+.hero-land {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 120px;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 12px;
+  padding: 6px 14px 6px 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: var(--hero-text-2);
+  background: rgba(255, 250, 240, 0.1);
+  border: 1px solid rgba(255, 250, 240, 0.18);
+  color: var(--hero-text);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.eyebrow-star {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--flag-yellow);
+  color: var(--flag-red);
 }
 
 .hero h1 {
   margin-top: 18px;
-  font-size: clamp(32px, 8vw, 56px);
-  line-height: 1.08;
+  font-size: clamp(34px, 9vw, 64px);
+  line-height: 1.05;
   font-weight: 700;
-  letter-spacing: -0.025em;
-  max-width: 16ch;
+  letter-spacing: -0.03em;
+  max-width: 15ch;
+}
+
+.word-wetter,
+.word-drier {
+  position: relative;
+  white-space: nowrap;
+}
+
+.word-wetter {
+  color: #9cc8f2;
+}
+
+.word-drier {
+  color: #f2c48f;
+}
+
+.word-wetter::after,
+.word-drier::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.02em;
+  height: 0.12em;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
+.hero-fr {
+  margin-top: 10px;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--hero-text-2);
 }
 
 .lede {
   margin-top: 14px;
-  max-width: 56ch;
-  color: var(--hero-text-2);
+  max-width: 54ch;
+  color: var(--hero-text);
+  opacity: 0.9;
   font-size: 17px;
 }
 
@@ -454,22 +514,22 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255, 250, 240, 0.08);
+  border: 1px solid rgba(255, 250, 240, 0.16);
   font-size: 13px;
   color: var(--hero-text);
 }
 
 .chip .icon {
-  color: var(--hero-text-2);
+  color: var(--sun);
 }
 
 .chip-k {
   display: block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--hero-text-2);
@@ -477,6 +537,21 @@ a:hover {
 
 .chip-error {
   color: #ffd1cc;
+}
+
+@media (min-width: 720px) {
+  .hero-inner {
+    padding-top: 56px;
+    padding-bottom: 150px;
+  }
+
+  .hero-land {
+    height: 170px;
+  }
+
+  .hero-fr {
+    font-size: 20px;
+  }
 }
 
 /* Layout */
@@ -488,7 +563,7 @@ a:hover {
 }
 
 .lift {
-  margin-top: -64px;
+  margin-top: -84px;
   position: relative;
 }
 
@@ -531,9 +606,9 @@ a:hover {
   flex: none;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
   background: var(--brand-soft);
   color: var(--brand);
 }
@@ -549,7 +624,7 @@ a:hover {
 }
 
 .card h2 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.01em;
@@ -578,8 +653,7 @@ a:hover {
 
 @media (min-width: 720px) {
   .card-aside {
-    flex: none;
-    padding: 6px 0 0;
+    padding-left: 52px;
   }
 }
 
@@ -647,6 +721,7 @@ a:hover {
 /* Answer (section 3) */
 .answer {
   box-shadow: var(--shadow-lg);
+  border-top: 4px solid var(--sun);
 }
 
 .answer-grid {
@@ -1485,7 +1560,7 @@ a:hover {
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
   color: var(--text-2);
 }
@@ -1554,11 +1629,11 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 0 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
   text-decoration: none;
   transition: background-color 180ms var(--ease), border-color 180ms var(--ease), transform 120ms var(--ease);
 }
@@ -1654,8 +1729,21 @@ a:hover {
 
 /* Footer (section 10) */
 .footer {
-  background: var(--hero-1);
+  position: relative;
+  background: var(--hero-1) var(--ndop);
   color: var(--hero-text);
+}
+
+.footer-band {
+  height: 6px;
+  background: linear-gradient(90deg, var(--flag-green) 0 33.33%, var(--flag-red) 33.33% 66.66%, var(--flag-yellow) 66.66%);
+}
+
+.footer-made {
+  font-family: var(--display);
+  font-size: 16px;
+  color: var(--sun);
+  margin-bottom: 4px;
 }
 
 .footer-inner {
@@ -1668,7 +1756,7 @@ a:hover {
 
 .footer-brand {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 22px;
   margin-bottom: 6px;
 }
 
@@ -1718,4 +1806,11 @@ a:hover {
   .footer-inner {
     grid-template-columns: 1.2fr 1fr 1fr;
   }
+}
+
+/* Text alternative under the chart (guide 1.9): visible, same size as notes */
+.chart-alt {
+  font-size: 13px;
+  color: var(--text-2);
+  padding: 0 2px;
 }
