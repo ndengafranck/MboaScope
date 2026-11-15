@@ -92,6 +92,7 @@ export const content = {
   mapLegendWetter: '+ Wetter',
   mapLegendNeutral: 'Near zero',
   mapLegendTitle: "Sen's slope, mm per year",
+  mapLegendSignificant: 'Dark outline: cell significant on its own test',
   mapHeadlineBox: 'headline box',
   mapCellTooltip: (slope, p, mean) => `Slope ${slope} mm per year, p = ${p}, mean ${mean} mm per year`,
   mapLoading: 'Loading map...',
