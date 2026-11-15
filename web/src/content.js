@@ -6,6 +6,19 @@
 export const content = {
   // 1. Header
   title: 'MboaScope',
+  eyebrow: 'NASA satellite rainfall, Douala, Cameroon',
+  navLabel: 'Sections',
+  skip: 'Skip to the answer',
+  nav: [
+    { id: 'answer', label: 'Answer' },
+    { id: 'chart', label: 'Trend' },
+    { id: 'map', label: 'Map' },
+    { id: 'robustness', label: 'Robustness' },
+    { id: 'explanation', label: 'Explained' },
+    { id: 'limitations', label: 'Limits' },
+    { id: 'method', label: 'Method' },
+  ],
+  mockBadge: 'Demo data',
   question: 'Is Douala getting wetter or drier?',
   subtitle: 'What NASA satellite rainfall estimates say about the Douala area, and how sure we can be.',
   headerDataset: (shortName, version) => `NASA GPM IMERG Final, monthly, version ${version} (${shortName})`,
@@ -23,6 +36,7 @@ export const content = {
 
   // 3. Answer card
   answerHeading: 'The answer',
+  answerSub: 'Headline result, fixed in advance: one box, one dataset, one test.',
   verdict: {
     significant_increase: 'The satellite record shows a statistically significant increase in annual rainfall.',
     significant_decrease: 'The satellite record shows a statistically significant decrease in annual rainfall.',
@@ -46,6 +60,9 @@ export const content = {
   pctLabel: 'Relative change',
   pctUnit: '% per decade',
   pLabel: 'p-value',
+  pHint: 'trend test',
+  mmPerYear: 'mm per year',
+  pettittLabel: 'Step change check',
   testLabel: 'Test used',
   yearsLabel: 'Years analysed',
   meanLabel: 'Mean annual total',
@@ -81,7 +98,7 @@ export const content = {
   noBox: 'The headline box is missing from annual.json.',
 
   // 5. Map
-  mapHeading: 'Where: the boxes and an exploratory trend map',
+  mapHeading: 'Where the signal is',
   mapIntro: (boxLabel) =>
     `The answer above uses the highlighted ${boxLabel}. The coloured grid runs the same test on each satellite cell separately.`,
   mapExploratory: (n, fp) => `Exploratory: ${n} separate tests, about ${fp} false positives expected by chance.`,
@@ -108,6 +125,7 @@ export const content = {
 
   // 7. Explanation
   explainHeading: 'In plain words',
+  explainSub: 'Written from the numbers above. Every number is checked by code before it is shown.',
   explainSummary: 'Summary',
   explainMeans: 'What it means',
   explainNotMeans: 'What it does not mean',
@@ -129,8 +147,15 @@ export const content = {
 
   // 9. Method and data
   methodHeading: 'Method and data',
-  methodText:
-    'Monthly mean rain rates are converted to monthly totals, summed into annual totals for each box, then tested for a monotonic trend with Mann-Kendall and Sen\'s slope. The test, box and period were fixed before looking at results.',
+  methodSub: 'How the numbers were made, and where they come from.',
+  methodSteps: [
+    'Download monthly NASA GPM IMERG Final rain rates for the region.',
+    'Convert mean rain rates to monthly totals, then sum each year for each box.',
+    'Leave out any year with a missing month. Never fill it in.',
+    "Test for a steady trend with Mann-Kendall and estimate its size with Sen's slope.",
+    'Repeat with other boxes and datasets to check robustness.',
+  ],
+  methodText: 'The test, the box and the period were fixed before looking at any result.',
   methodDoi: 'Dataset DOI',
   methodAccess: 'Access method',
   methodPeriod: 'Period',
@@ -152,4 +177,5 @@ export const content = {
   challenge: null, // Lead fills in the official challenge name (issue #1)
   footerChallenge: (name) => `Challenge: ${name}`,
   footerData: 'Data: NASA GES DISC. Map tiles: OpenStreetMap contributors.',
+  footerSource: 'Data and code',
 }

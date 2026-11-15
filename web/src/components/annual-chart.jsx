@@ -2,6 +2,7 @@ import { Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveConta
 import { content } from '../content.js'
 import { boxLabel, firstYear, num, signed } from '../lib/format.js'
 import { SENSOR_CHANGE_YEAR } from '../lib/science.js'
+import { IconChart } from './icons.jsx'
 import { Section } from './section.jsx'
 
 // Section 4. Annual totals of the headline box, the Sen line from analysis.json,
@@ -11,6 +12,8 @@ export default function AnnualChart({ annual, analysis }) {
     <Section
       id="chart"
       title={content.chartHeading}
+      subtitle={annual.data && analysis.data ? content.chartIntro(boxLabel(annual.data, analysis.data.headline.box)) : null}
+      icon={IconChart}
       files={[
         ['annual', annual],
         ['analysis', analysis],
@@ -60,8 +63,7 @@ function ChartBody({ annual, h }) {
 
   return (
     <figure className="chart">
-      <p className="section-intro">{content.chartIntro(boxLabel(annual, h.box))}</p>
-      <ul className="chart-key" aria-hidden="true">
+      <ul className="legend-row" aria-hidden="true">
         <li>
           <span className="key-bar" /> {content.chartBars}
         </li>
@@ -74,22 +76,34 @@ function ChartBody({ annual, h }) {
       </ul>
       <div className="chart-box" role="img" aria-label={alt}>
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={rows} margin={{ top: 24, right: 8, bottom: 0, left: -8 }}>
-            <CartesianGrid vertical={false} stroke="var(--rule)" />
-            <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'var(--ink-2)' }} tickLine={false} minTickGap={12} />
+          <ComposedChart data={rows} margin={{ top: 26, right: 8, bottom: 0, left: -6 }}>
+            <defs>
+              <linearGradient id="barFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--bar-top)" />
+                <stop offset="100%" stopColor="var(--bar-bottom)" />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} stroke="var(--grid)" strokeDasharray="3 4" />
+            <XAxis
+              dataKey="year"
+              tick={{ fontSize: 11, fill: 'var(--text-3)', fontFamily: 'var(--mono)' }}
+              tickLine={false}
+              axisLine={{ stroke: 'var(--border)' }}
+              minTickGap={14}
+            />
             <YAxis
-              tick={{ fontSize: 11, fill: 'var(--ink-2)' }}
+              tick={{ fontSize: 11, fill: 'var(--text-3)', fontFamily: 'var(--mono)' }}
               tickFormatter={(v) => num(v)}
               tickLine={false}
               axisLine={false}
               width={52}
             />
             <Tooltip content={<ChartTooltip />} cursor={{ fill: 'var(--hover)' }} />
-            <Bar dataKey="total" fill="var(--bar)" radius={[2, 2, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="total" fill="url(#barFill)" radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
             <Line
               dataKey="trend"
               type="linear"
-              stroke="var(--ink)"
+              stroke="var(--trend)"
               strokeWidth={2.5}
               dot={false}
               activeDot={false}
@@ -111,11 +125,15 @@ function ChartBody({ annual, h }) {
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      <figcaption>
-        <p className="marker-note">
-          <span className="key-marker" aria-hidden="true" /> {content.chartMarkerNote(SENSOR_CHANGE_YEAR)}
+      <figcaption className="chart-notes">
+        <p className="note note-marker">
+          <span className="key-marker" aria-hidden="true" />
+          <span>{content.chartMarkerNote(SENSOR_CHANGE_YEAR)}</span>
         </p>
-        <p>{excluded.length > 0 ? content.chartExcluded(excluded.join(', ')) : content.chartNoExcluded}</p>
+        <p className="note">
+          <span className="key-gap" aria-hidden="true" />
+          <span>{excluded.length > 0 ? content.chartExcluded(excluded.join(', ')) : content.chartNoExcluded}</span>
+        </p>
         <p className="sr-only">{alt}</p>
       </figcaption>
       <details className="chart-data">
@@ -146,9 +164,11 @@ function ChartTooltip({ active, payload, label }) {
   const row = payload[0].payload
   return (
     <div className="tooltip">
-      <strong>{label}</strong>
-      <span>
-        {content.tooltipTotal}: {row.total === null ? '-' : `${num(row.total)} ${content.mmUnit}`}
+      <span className="tooltip-year">{label}</span>
+      <span className="tooltip-row">
+        <span className="key-bar" aria-hidden="true" />
+        {content.tooltipTotal}
+        <strong>{row.total === null ? content.chartTableExcluded : `${num(row.total)} ${content.mmUnit}`}</strong>
       </span>
     </div>
   )
