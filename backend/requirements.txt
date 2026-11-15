@@ -1,0 +1,15 @@
+# API
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+python-dotenv>=1.0
+# science
+numpy>=1.26
+pandas>=2.1
+scipy>=1.11
+pymannkendall>=1.4.3
+# AI (imported lazily; the template explanation works without it)
+google-genai>=1.0
+# tests
+pytest>=7.4
+httpx>=0.27
