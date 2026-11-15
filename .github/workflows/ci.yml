@@ -31,3 +31,9 @@ jobs:
         working-directory: frontend
       - run: npm run build
         working-directory: frontend
+
+  integration:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "backend and frontend passed"
