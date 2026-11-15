@@ -1,49 +1,59 @@
 # MboaScope
 
-Is Douala getting wetter or drier? MboaScope tests whether NASA's GPM IMERG satellite rainfall estimates (Final run, monthly, Version 07, DOI 10.5067/GPM/IMERG/3B-MONTH/07) show a statistically detectable trend in annual rainfall over a 33 km box around Douala, Cameroon, from 2001 to 2025. It reports the answer, the uncertainty and the known data threats in plain language. Built for NASA Space Apps 2026. Challenge: `TBD`.
+**Has rainfall increased or decreased over time in a region of Cameroon, and is that trend statistically significant?**
 
-Live site: https://yannx8.github.io/MboaScope/
-Board: `TBD` (see the project board link in the repo's Projects tab)
+MboaScope answers that question for ten study regions (one per regional capital) from NASA's GPM IMERG
+satellite rainfall (Final run, monthly, Version 07, DOI 10.5067/GPM/IMERG/3B-MONTH/07). It runs
+Mann-Kendall, Sen's slope and Pettitt tests, shows the uncertainty and the known data threats, and
+explains the result in plain language with checked AI text. Started at NASA Space Apps 2026.
 
-## Start here
-
-Read `AGENTS.md` and `docs/TEAM.md`. Then paste your role prompt from `docs/prompts/` into your AI assistant.
-
-## Run it
+## Structure
 
 ```
-make setup      # venv, Python deps, npm ci in web/
-make mock       # synthetic data, so nobody waits
-make test       # contract and unit tests
-make web-dev    # local site
+backend/      FastAPI + SQLite. app/routes, app/services/{nasa,gis,analytics,ai}, app/schemas
+frontend/     React + TypeScript (Vite). pages: Dashboard, Explorer, Analysis, Assistant
+data/         regions/ (study regions), raw/, processed/ (SQLite, gitignored), sample/
+tests/        pytest suite for the backend (no network)
+docs/         architecture.md, api.md, methodology.md, TEAM.md (who does what), MIGRATION.md
 ```
 
-No `make` (Windows)? Use the plain command:
+## Run it locally
 
-| make target | Plain command |
-| --- | --- |
-| `make setup` | `python -m venv .venv`, then `.venv/Scripts/python -m pip install -r requirements.txt`, then `npm ci --prefix web` |
-| `make mock` | `python -m pipeline.make_mock` |
-| `make spike` | `python -m pipeline.inspect_granule` |
-| `make fetch` | `python -m pipeline.fetch_imerg` |
-| `make giovanni FILE=f.csv` | `python -m pipeline.import_giovanni f.csv` (add `--activate` for `ACTIVATE=1`) |
-| `make process` | `python -m pipeline.aggregate` |
-| `make analyse` | `python -m pipeline.analyse` |
-| `make explain` | `python -m pipeline.explain` (add `--llm` for `LLM=1`) |
-| `make build` | `python -m pipeline.build` (add `--llm` for `LLM=1`) |
-| `make test` | `python -m pytest -q` |
-| `make web-dev` | `npm run dev --prefix web` |
-| `make web-build` | `npm run build --prefix web` |
+Needs Python 3.10+ and Node 20.19+.
 
-Fetching real data needs `pip install -r requirements-fetch.txt` and a NASA Earthdata login in `.env` (see `.env.example`).
+```bash
+# backend (terminal 1)
+python -m venv .venv
+.venv/bin/pip install -r backend/requirements.txt      # Windows: .venv\Scripts\pip
+cd backend
+../.venv/bin/python -m app.cli seed-mock               # demo data for all ten regions
+../.venv/bin/uvicorn app.main:app --reload             # http://127.0.0.1:8000/docs
+
+# frontend (terminal 2)
+cd frontend
+npm install
+npm run dev                                            # http://localhost:5173
+```
+
+Tests: `python -m pytest -q` from the repository root. Frontend checks: `npm run build` in `frontend/`.
+With `make`: `make setup`, `make mock`, `make api`, `make web`, `make test`.
+
+Real NASA data needs `pip install -r backend/requirements-fetch.txt` and an Earthdata login in `.env`
+(copy `.env.example`). See `docs/architecture.md`, "Data ingestion".
+
+## Status
+
+The full chain works on **mock data**: every page shows a "Demo data" banner until real NASA data is
+ingested. Remaining work and who owns it: `docs/TEAM.md`.
 
 ## Docs
 
-- `docs/TEAM.md`: roles, ownership, gates, issues.
-- `docs/CONTRACT.md`: the data formats between modules.
-- `docs/SCIENCE.md`: methods and allowed wording.
-- `docs/SUBMISSION.md`: submission checklist.
+- `docs/TEAM.md`: the two developer roles and the remaining tasks.
+- `docs/api.md`: the API contract between frontend and backend.
+- `docs/architecture.md`: modules, request flow, design decisions.
+- `docs/methodology.md`: data, methods, limitations and allowed wording.
 
 ## Data credit
 
-GPM IMERG Final Precipitation L3 1 month 0.1 degree x 0.1 degree V07 (GPM_3IMERGM), NASA GES DISC. DOI: 10.5067/GPM/IMERG/3B-MONTH/07.
+GPM IMERG Final Precipitation L3 1 month 0.1 degree x 0.1 degree V07 (GPM_3IMERGM), NASA GES DISC.
+DOI: 10.5067/GPM/IMERG/3B-MONTH/07.

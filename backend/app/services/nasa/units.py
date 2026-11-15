@@ -1,4 +1,4 @@
-"""Rate to monthly total conversion. Owner: Processing (issue #13)."""
+"""Rate to monthly total conversion. Owner: Developer A."""
 from __future__ import annotations
 
 import calendar

@@ -1,3 +1,6 @@
+# Frontend deployment to GitHub Pages (task B11). Disabled until the backend is deployed (task A9):
+# set the repository variable VITE_API_URL to the backend URL, then remove the `if: false` line.
+# GitHub Pages serves a single-page app only at the root; deep links need the 404.html copy below.
 name: pages
 
 on:
@@ -16,6 +19,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: false
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -26,13 +30,16 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
       - run: npm ci
-        working-directory: web
+        working-directory: frontend
       - run: npm run build
-        working-directory: web
+        working-directory: frontend
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+      - run: cp frontend/dist/index.html frontend/dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: web/dist
+          path: frontend/dist
       - id: deployment
         uses: actions/deploy-pages@v4

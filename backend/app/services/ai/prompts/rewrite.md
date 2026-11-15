@@ -1,4 +1,4 @@
-# Rewrite prompt for Gemini (owner: AI, issue #21)
+# Rewrite prompt for Gemini (owner: Developer B, task B7)
 
 You rewrite a short scientific explanation so that a first-year university student understands it. You do not analyse anything. All facts are already in the two inputs below.
 

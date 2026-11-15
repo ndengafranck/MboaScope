@@ -41,7 +41,7 @@ PETTITT_2014_SENTENCE = (
     "so it may be an artifact of the data rather than a real shift."
 )
 
-# Banned column of docs/SCIENCE.md. Word starts only, so "improve" and
+# Banned column of docs/methodology.md, section 7. Word starts only, so "improve" and
 # "unstable" do not match. No exemption for negated sentences.
 BANNED_PATTERNS = (
     r"\bclimate change",
@@ -566,7 +566,7 @@ def _make_caller(api_key: str, model: str):
 
 
 def run_eval(use_llm: bool) -> int:
-    """Print the 6-case evaluation as markdown, ready to paste in issue #21."""
+    """Print the 6-case evaluation as markdown, ready to paste in docs/ai-eval.md (task B7)."""
     api_key, model = _gemini_settings()
     if use_llm and not api_key:
         print("explain: GEMINI_API_KEY is not set in .env", file=sys.stderr)

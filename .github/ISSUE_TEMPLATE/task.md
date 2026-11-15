@@ -1,25 +1,22 @@
 ---
 name: Task
-about: One unit of work for one role
+about: One task from docs/TEAM.md
 labels: ""
 ---
 
-## Owner role
+## Task
+<!-- A1 ... A9 or B1 ... B12, as in docs/TEAM.md -->
 
-## Role prompt section
-<!-- docs/prompts/<role>.md, issue #n -->
+## Owner
+<!-- Developer A or Developer B -->
 
 ## Files
-<!-- Only files owned by the role (docs/TEAM.md, section 2). -->
 
 ## Steps
 
-## Acceptance criteria
+## Done when
 
 ## Depends on
 
-## Gate
-<!-- G1 / G2 / G3 / G4 -->
-
 ## Branch
-<!-- feature/<area>-<n>-<slug> -->
+<!-- feature/<a|b>-<task>-<slug> -->

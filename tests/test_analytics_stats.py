@@ -1,4 +1,4 @@
-"""Tests for pipeline/stats.py (issue #16). Seeded, no network."""
+"""Tests for app/services/analytics/stats.py. Seeded, no network."""
 import math
 
 import numpy as np

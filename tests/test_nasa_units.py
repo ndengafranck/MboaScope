@@ -1,4 +1,4 @@
-"""Tests for pipeline/units.py (issue #13)."""
+"""Tests for app/services/nasa/units.py."""
 import pytest
 
 from app.services.nasa.units import monthly_total_mm

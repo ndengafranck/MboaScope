@@ -1,23 +1,20 @@
 Closes #
 
-## Role
-<!-- Lead / Data / Processing / Analytics / AI / Frontend -->
+## Developer
+<!-- A (data, science, backend) / B (frontend, AI) -->
 
 ## What changed
 <!-- Plain English, short sentences. -->
 
-## Files touched
-<!-- Every file must be owned by your role (docs/TEAM.md, section 2). -->
-
-## Contract changed?
+## API contract changed?
 - [ ] No
-- [ ] Yes (issue labelled `contract`, Lead approved): #
+- [ ] Yes: `backend/app/schemas/`, `frontend/src/types/api.ts` and `docs/api.md` all updated, other developer approved
 
 ## How tested
-<!-- Paste the command and its output, for example `python -m pytest -q`. -->
+<!-- Paste commands and output: python -m pytest -q, npm run build -->
 
 ```
 ```
 
 ## Screenshots (UI changes)
-<!-- Mobile (360 px) and desktop. -->
+<!-- 360 px and 1280 px. -->
