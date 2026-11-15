@@ -1,5 +1,11 @@
-"""Rate to monthly total conversion. Owner: Processing. Stub: implement per docs/prompts/processing.md, issue #13."""
+"""Rate to monthly total conversion. Owner: Processing (issue #13)."""
 from __future__ import annotations
+
+import calendar
+
+HOURLY = {"mm/hr", "mm/h", "mmhr-1", "mmh-1"}
+DAILY = {"mm/day", "mm/d", "mmd-1"}
+MONTHLY = {"mm/month", "mm"}
 
 
 def monthly_total_mm(rate: float, units: str | bytes, year: int, month: int) -> float:
@@ -11,7 +17,17 @@ def monthly_total_mm(rate: float, units: str | bytes, year: int, month: int) -> 
     Anything else raises ValueError naming the unit. Bytes are decoded; units are
     lowercased and stripped of spaces before matching. Days come from calendar.monthrange.
     """
-    raise NotImplementedError("units.monthly_total_mm: see docs/prompts/processing.md #13")
+    if isinstance(units, bytes):
+        units = units.decode("utf-8")
+    u = str(units).lower().replace(" ", "")
+    days = calendar.monthrange(int(year), int(month))[1]
+    if u in HOURLY:
+        return float(rate) * 24 * days
+    if u in DAILY:
+        return float(rate) * days
+    if u in MONTHLY:
+        return float(rate)
+    raise ValueError(f"unknown precipitation unit: {units!r}")
 
 
 def main() -> None:
