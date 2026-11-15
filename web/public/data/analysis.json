@@ -1,6 +1,6 @@
 {
   "contract_version": "1.0",
-  "generated_at": "2026-11-14T14:53:59Z",
+  "generated_at": "2026-11-15T10:02:19Z",
   "is_mock": true,
   "headline": {
     "box": "box_3x3",
@@ -9,7 +9,7 @@
     "n_years": 25,
     "alpha": 0.05,
     "mean_annual_mm": 3724,
-    "lag1_autocorr": 0.23,
+    "lag1_autocorr": 0.22,
     "autocorr_significant": false,
     "mk_test_used": "original",
     "mk_original": {
