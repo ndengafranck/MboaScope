@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../services/api'
 import type { InvestigationRequest, Region } from '../types/api'
 import { useApi } from './useApi'
@@ -24,7 +24,9 @@ const InvestigationContext = createContext<InvestigationContextValue | null>(nul
  * so every page shares it and a link reproduces exactly what the user saw.
  */
 export function InvestigationProvider({ children }: { children: ReactNode }) {
-  const [params, setParams] = useSearchParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const params = new URLSearchParams(location.search)
   const regions = useApi(() => api.regions(), [])
 
   const request: InvestigationRequest = {
@@ -42,20 +44,17 @@ export function InvestigationProvider({ children }: { children: ReactNode }) {
       request,
       setRequest: (next) => {
         const merged = { ...request, ...next }
-        setParams(
-          (prev) => {
-            const p = new URLSearchParams(prev)
-            p.set('region', merged.region_id)
-            p.set('from', String(merged.start_year))
-            p.set('to', String(merged.end_year))
-            return p
-          },
-          { replace: true },
-        )
+        const p = new URLSearchParams(location.search)
+        p.set('region', merged.region_id)
+        p.set('from', String(merged.start_year))
+        p.set('to', String(merged.end_year))
+        // Stay on the current page. (setSearchParams here would resolve against "/",
+        // because this provider sits outside <Routes>.)
+        navigate({ pathname: location.pathname, search: `?${p}` }, { replace: true })
       },
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regions.data, regions.error, request.region_id, request.start_year, request.end_year])
+  }, [regions.data, regions.error, request.region_id, request.start_year, request.end_year, location.pathname])
 
   return <InvestigationContext.Provider value={value}>{children}</InvestigationContext.Provider>
 }

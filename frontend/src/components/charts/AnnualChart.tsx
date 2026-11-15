@@ -21,7 +21,7 @@ export function AnnualChart({ years, h, height = 320 }: { years: AnnualPoint[]; 
 
   return (
     <figure className="chart" style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="99%" height="100%">
         <ComposedChart data={rows} margin={{ top: 20, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid vertical={false} stroke="var(--grid)" strokeDasharray="3 4" />
           <XAxis dataKey="year" tickLine={false} axisLine={{ stroke: 'var(--border)' }} minTickGap={14} tick={{ fontSize: 11 }} />

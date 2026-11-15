@@ -7,7 +7,7 @@ export function ClimatologyChart({ data }: { data: ClimatologyPoint[] }) {
   const rows = data.map((d) => ({ month: MONTHS[d.month - 1], mm: d.mean_mm }))
   return (
     <figure className="chart" style={{ height: 240 }}>
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="99%" height="100%">
         <BarChart data={rows} margin={{ top: 10, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid vertical={false} stroke="var(--grid)" strokeDasharray="3 4" />
           <XAxis dataKey="month" tickLine={false} tick={{ fontSize: 11 }} />
