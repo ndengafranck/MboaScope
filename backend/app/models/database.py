@@ -125,7 +125,13 @@ def upsert_source(region_id: str, source: dict[str, Any], db_path: Path | None =
 
 
 def log_investigation(record: dict[str, Any], db_path: Path | None = None) -> int:
+    """Log an investigation; repeated calls for the same one (several pages) reuse the last row."""
     with connect(db_path) as conn:
+        last = conn.execute("SELECT * FROM investigations ORDER BY id DESC LIMIT 1").fetchone()
+        if last is not None and all(
+            last[k] == record[k] for k in ("region_id", "start_year", "end_year", "verdict")
+        ) and bool(last["is_mock"]) == bool(record["is_mock"]):
+            return int(last["id"])
         cur = conn.execute(
             """INSERT INTO investigations
                (region_id, start_year, end_year, verdict, p, sen_slope_mm_per_year, is_mock, created_at)
