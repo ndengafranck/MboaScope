@@ -39,10 +39,18 @@ FORBIDDEN_HINT = (
     "If it still fails, add --download."
 )
 
+EULA_HINT = (
+    "NASA requires you to accept the GES DISC user agreement once. Open any IMERG file link in a "
+    "browser, sign in with the same Earthdata account, click Authorize and Agree, then run the "
+    "command again."
+)
+
 
 def explain_http_error(err: Exception) -> None:
     """Turn a 401/403 from the NASA file server into a readable instruction."""
     status = getattr(err, "status", None) or getattr(getattr(err, "response", None), "status_code", None)
+    if type(err).__name__ == "EulaNotAccepted" or "Eula" in str(err):
+        raise SystemExit(EULA_HINT) from err
     if status in (401, 403) or "403" in str(err) or "Forbidden" in str(err):
         raise SystemExit(FORBIDDEN_HINT) from err
 
@@ -121,11 +129,19 @@ def one_per_month(results: list) -> list:
     return [best[m] for m in sorted(best)]
 
 
+def open_grid(handle):
+    """Open the Grid group. Times are not decoded: IMERG uses calendar 'julian', which needs
+    cftime, and the month already comes from the file name."""
+    import xarray as xr
+
+    return xr.open_dataset(handle, group=GROUP, engine="h5netcdf", decode_times=False)
+
+
 def read_cells(handle, regions: list[Region]) -> tuple[dict[str, pd.DataFrame], str]:
     """Per-region cell rates from one open granule. Returns ({region_id: df(lat, lon, rate)}, units)."""
     import xarray as xr
 
-    ds = xr.open_dataset(handle, group=GROUP, engine="h5netcdf")
+    ds = open_grid(handle)
     da = ds[VARIABLE].squeeze("time", drop=True)
     units = str(da.attrs.get("units", "")).strip()
     out = {}

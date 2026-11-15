@@ -31,12 +31,16 @@ def make_granule(path, rate: float, hole: tuple[float, float] | None = None) -> 
     da = xr.DataArray(
         values,
         dims=("time", "lon", "lat"),
-        coords={"time": [0], "lon": lon, "lat": lat},
+        coords={"lon": lon, "lat": lat},
         attrs={"units": "mm/hr"},
         name="precipitation",
     )
     da.encoding["_FillValue"] = FILL
-    da.to_dataset().to_netcdf(path, group="Grid", engine="h5netcdf")
+    ds = da.to_dataset()
+    # Same time encoding as the real files: decoding it would need cftime.
+    ds["time"] = ("time", np.array([1417392000], dtype="int32"), {
+        "units": "seconds since 1980-01-06 00:00:00 UTC", "calendar": "julian", "standard_name": "time"})
+    ds.to_netcdf(path, group="Grid", engine="h5netcdf")
 
 
 class FakeGranule:
