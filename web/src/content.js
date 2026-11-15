@@ -6,7 +6,7 @@
 export const content = {
   // 1. Header
   title: 'MboaScope',
-  eyebrow: 'NASA satellite rainfall, Douala, Cameroon',
+  eyebrow: 'Mboa means home. Rainfall over Douala, Cameroon',
   navLabel: 'Sections',
   skip: 'Skip to the answer',
   nav: [
@@ -20,6 +20,10 @@ export const content = {
   ],
   mockBadge: 'Demo data',
   question: 'Is Douala getting wetter or drier?',
+  questionParts: ['Is Douala getting ', 'wetter', ' or ', 'drier', '?'],
+  questionFr: 'Douala devient-elle plus humide ou plus sèche ?',
+  sourceLabel: 'Source',
+  sourceValue: 'NASA satellites',
   subtitle: 'What NASA satellite rainfall estimates say about the Douala area, and how sure we can be.',
   headerDataset: (shortName, version) => `NASA GPM IMERG Final, monthly, version ${version} (${shortName})`,
   headerPeriod: (start, end) => `${start} to ${end}`,
@@ -174,6 +178,7 @@ export const content = {
   footerTeam: 'Team',
   team: ['Yann', 'Firmin', 'Theophile', 'Bako', 'Franck', 'Pavel'],
   footerEvent: 'Built for NASA Space Apps 2026',
+  footerMade: 'Made in Cameroon, for the people of Douala.',
   challenge: null, // Lead fills in the official challenge name (issue #1)
   footerChallenge: (name) => `Challenge: ${name}`,
   footerData: 'Data: NASA GES DISC. Map tiles: OpenStreetMap contributors.',

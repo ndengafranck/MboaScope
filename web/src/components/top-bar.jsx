@@ -24,13 +24,23 @@ export default function TopBar({ isMock }) {
 
   return (
     <div className="topbar">
+      <div className="flag-strip" aria-hidden="true">
+        <span />
+        <span>
+          <svg viewBox="0 0 24 24" width="9" height="9">
+            <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.9-6.3 3.9 1.7-7L2 9.5l7.1-.6z" fill="#fcd116" />
+          </svg>
+        </span>
+        <span />
+      </div>
       <div className="container topbar-inner">
         <a className="logo" href="#top" aria-label={content.title}>
           <span className="logo-mark" aria-hidden="true">
             <svg viewBox="0 0 32 32" width="28" height="28">
-              <circle cx="16" cy="16" r="15" fill="var(--brand)" />
-              <path d="M16 6c3.8 4.6 6.6 8.2 6.6 11.4a6.6 6.6 0 0 1-13.2 0C9.4 14.2 12.2 10.6 16 6z" fill="#fff" />
-              <path d="M12.4 19.6l2.6-2.6 2 2 3-3" stroke="var(--brand)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              <rect x="1" y="1" width="30" height="30" rx="10" fill="var(--brand)" />
+              <circle cx="23" cy="9" r="4" fill="var(--sun)" />
+              <path d="M14 7c3.6 4.3 6.2 7.7 6.2 10.7a6.2 6.2 0 0 1-12.4 0C7.8 14.7 10.4 11.3 14 7z" fill="#fffaf0" />
+              <path d="M10.8 20l2.3-2.3 1.8 1.8 2.7-2.7" stroke="var(--brand)" strokeWidth="1.7" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </span>
           <span className="logo-text">{content.title}</span>

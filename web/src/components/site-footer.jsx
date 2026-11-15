@@ -6,9 +6,11 @@ import { IconGithub } from './icons.jsx'
 export default function SiteFooter() {
   return (
     <footer className="footer">
+      <div className="footer-band" aria-hidden="true" />
       <div className="container footer-inner">
         <div>
           <p className="footer-brand">{content.title}</p>
+          <p className="footer-made">{content.footerMade}</p>
           <p className="footer-muted">{content.footerEvent}</p>
           {content.challenge && <p className="footer-muted">{content.footerChallenge(content.challenge)}</p>}
         </div>
