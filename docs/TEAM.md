@@ -1,118 +1,115 @@
-# MboaScope team playbook (NASA Space Apps 2026, 14-15 November)
+# MboaScope: two-developer plan
 
-Six developers, one repo, one contract. Each developer works with their own AI assistant, which must follow `AGENTS.md`. All times are Douala time (UTC+1).
+The project moved from a six-role static pipeline to the planned structure: a FastAPI backend with
+SQLite, a React + TypeScript frontend, and ten study regions across Cameroon. This page says who owns
+what, what is already done, and the remaining work, split between two developers.
 
-## 1. Roles and owners
+**The one question the MVP answers:** has rainfall increased or decreased over time in a selected
+region of Cameroon, and is that trend statistically significant?
 
-| Role | Name | GitHub | Branch prefix | Role prompt |
-| --- | --- | --- | --- | --- |
-| Lead and integration | Yann | yannx8 | `feature/lead-` | `docs/prompts/lead.md` |
-| Data engineering | Firmin | Firminfire | `feature/data-` | `docs/prompts/data.md` |
-| Geospatial processing | Theophile | excellenttheophile4-byte | `feature/processing-` | `docs/prompts/processing.md` |
-| Scientific analysis | Bako | yannsamir22 | `feature/analytics-` | `docs/prompts/analytics.md` |
-| AI engineering | Franck | ndengafranck | `feature/ai-` | `docs/prompts/ai.md` |
-| Frontend | Pavel | Paveljuniorr | `feature/frontend-` | `docs/prompts/frontend.md` |
+## 1. Roles
 
-Pick roles by strongest skill at kickoff. If the team is five, Data and Processing merge into one person. Whoever planned to do "backend" takes Data or Processing: there is no backend.
-
-## 2. File ownership (only the owner edits; others open an issue)
-
-| Role | Owns |
-| --- | --- |
-| Lead | `AGENTS.md`, `CLAUDE.md`, `README.md`, `docs/TEAM.md`, `docs/CONTRACT.md`, `docs/contract/`, `docs/SUBMISSION.md`, `Makefile`, `requirements*.txt`, `.github/`, `pipeline/common.py`, `pipeline/build.py`, `tests/test_contract.py`, `web/public/data/provenance.json` |
-| Data | `pipeline/fetch_imerg.py`, `pipeline/import_giovanni.py`, `pipeline/inspect_granule.py`, `pipeline/make_mock.py`, `pipeline/fetch_gpcp.py`, `data/interim/region_monthly_rate.csv`, `data/interim/box_monthly_rate.csv`, `data/interim/sources.json`, `tests/test_data_*.py` |
-| Processing | `pipeline/config.py`, `pipeline/units.py`, `pipeline/aggregate.py`, `data/interim/annual_box.csv`, `data/interim/annual_cell.csv`, `web/public/data/annual.json`, `tests/test_units.py`, `tests/test_aggregate.py` |
-| Analytics | `pipeline/stats.py`, `pipeline/analyse.py`, `web/public/data/analysis.json`, `web/public/data/spatial.json`, `tests/test_stats.py`, `tests/test_analyse.py` |
-| AI | `pipeline/explain.py`, `pipeline/prompts/`, `web/public/data/explanation.json`, `docs/METHOD.md`, `tests/test_explain.py` |
-| Frontend | everything in `web/` except `web/public/data/*.json` |
-
-Owning a generated file means your code is the only code that writes it. Who commits it is a separate rule: see "Who commits generated files" in `docs/CONTRACT.md` (short version: you commit code and tests, the Lead commits the outputs).
-
-## 3. Gates (hard deadlines)
-
-| Gate | Time | Definition of done |
+| | Developer A: Data, Science & Backend | Developer B: Frontend & AI |
 | --- | --- | --- |
-| G0 | Sat 14:30 | Repo, contract, fixtures, issues ready; everyone cloned and running their assistant |
-| G1 | Sat 19:00 | Real IMERG monthly data on `main` (plan A or B); every module works on mock data and has tests |
-| G2 | Sat 23:00 | `make build` on real data; site deployed with real numbers |
-| G3 | Sun 12:00 | Results frozen, tag `v1.0-results`; no pipeline change after this |
-| G4 | Sun 18:00 | Demo published and project submitted |
+| Stack | Python, FastAPI, SQLite, NASA Earthdata | React, TypeScript, Vite, Recharts, Leaflet, Gemini |
+| Owns | `backend/` except `services/ai/` and `routes/assistant.py` and `schemas/ai.py`; `data/`; `tests/` except `test_ai_interpreter.py`; `Makefile`; `.github/workflows/ci.yml` | `frontend/`; `backend/app/services/ai/`; `backend/app/routes/assistant.py`; `backend/app/schemas/ai.py`; `tests/test_ai_interpreter.py`; `.github/workflows/pages.yml` |
+| Branch prefix | `feature/a-<task>-<slug>` | `feature/b-<task>-<slug>` |
+| Commit prefix | `data:`, `gis:`, `analytics:`, `api:` | `frontend:`, `ai:` |
 
-## 4. Issues (created in this order, so numbers are fixed)
+Shared (change only together, in one pull request reviewed by both): the API contract, which is
+`backend/app/schemas/*.py` **and** `frontend/src/types/api.ts` **and** `docs/api.md`. Also
+`AGENTS.md`, `README.md`, this file.
 
-| # | Owner | Issue | Gate |
+Pick roles by strongest skill. A Python-first developer takes A; a frontend-first developer takes B.
+The AI module is mostly finished, so it adds little load to B. If the AI engineer prefers to stay
+on Python, move tasks B7 to B9 to Developer A and keep B on the frontend only.
+
+## 2. What is already done (on branch `restructure/fastapi-react-mvp`)
+
+- FastAPI backend with the five MVP endpoints, plus `GET /api/health` and `GET /api/analysis/history`.
+- SQLite storage: observations, Giovanni box observations, data sources, investigation log.
+- Ten study regions (one per regional capital), box geometry, per-cell extraction, annual totals.
+- Statistics: Mann-Kendall, Hamed-Rao (bug fixed: it was running the original test), Sen's slope
+  with 95% CI, Pettitt, lag-1 autocorrelation, sensitivity boxes, exploratory per-cell map.
+- AI interpretation: checked template for any region, optional Gemini rewrite with fallback,
+  suggested follow-up investigations.
+- Deterministic mock data for all ten regions, so nobody waits for NASA.
+- New frontend: Dashboard, Explorer, Analysis, Assistant pages, wired to the real API.
+- 246 tests passing (`python -m pytest -q`), frontend type-checks and builds.
+
+What is **not** done: no real NASA data yet (everything is mock), nine of ten region boxes are not
+checked on a map, the frontend is functional but not designed, nothing is deployed.
+
+## 3. Remaining work
+
+Each task is one GitHub issue. "Done" = merged on `main`, tests green, the check in the last column passes.
+
+### Developer A: Data, Science & Backend
+
+| # | Task | Files | Done when |
 | --- | --- | --- | --- |
-| 1 | Lead | Kickoff: confirm the official challenge, fill names in TEAM.md, brief the team | G0 |
-| 2 | Lead | Board, branch protection, push access for all six verified | G0 |
-| 3 | Lead | `build.py`: run the chain, write provenance, validate all JSON; CI runs `make build` on mock | G2 |
-| 4 | Lead | Integration duty: merge pull requests within 30 minutes, check each gate | G1-G3 |
-| 5 | Lead | Freeze: tag `v1.0-results` after Analytics and AI sign off | G3 |
-| 6 | Lead | Demo: 30-second video with English subtitles or 7 slides in English | G4 |
-| 7 | Lead | Submission page complete and submitted | G4 |
-| 8 | Data | Spike: one real granule, inspect structure and units, confirm Dec 2025 exists | G1 |
-| 9 | Data | Full fetch of the region, 2001 to END_YEAR | G1 |
-| 10 | Data | Plan B ready: Giovanni importer plus the Giovanni CSV for `box_3x3` committed as cross-check | G1 |
-| 11 | Data | Should: GPCP V3.3 monthly for `box_3x3` | G3 |
-| 12 | Processing | Confirm boxes on a map; adjust `config.py` only if needed | G1 |
-| 13 | Processing | `units.py` with tests | G1 |
-| 14 | Processing | `aggregate.py`: annual CSVs and `annual.json` (mock by G1, real by G2) | G1-G2 |
-| 15 | Processing | Cross-check one month against Giovanni, within 1% | G2 |
-| 16 | Analytics | `stats.py` with tests | G1 |
-| 17 | Analytics | `analyse.py`: headline, sensitivity, trend map | G2 |
-| 18 | Analytics | Real-result note for AI and demo, plus second-implementation check | G3 |
-| 19 | Analytics | Should: GPCP sensitivity row | G3 |
-| 20 | AI | Template explanation with number and claim checks | G2 |
-| 21 | AI | Gemini rewrite, offline, checked; 6 test cases | G3 |
-| 22 | AI | `docs/METHOD.md` and limitations text final | G3 |
-| 23 | Frontend | One-page layout on fixtures, mobile first | G1 |
-| 24 | Frontend | Map with boxes and exploratory trend grid | G2 |
-| 25 | Frontend | Real data, polish, accessibility | G3 |
-| 26 | Frontend | Two outsider tests and fixes | G4 |
+| A1 | **Real data spike.** Run `python -m app.cli inspect-granule` on one granule. Confirm group `Grid`, variable `precipitation`, dimension order, `units` attribute, fill value, and that December 2025 exists (else set `END_YEAR = 2024`). Fix `fetch_imerg.py` if anything differs. | `services/nasa/inspect_granule.py`, `fetch_imerg.py`, `core/config.py` | Printed structure pasted in the issue |
+| A2 | **Full fetch, all ten regions.** `python -m app.cli fetch-imerg --limit 3` first, then the full run. Plan B if Earthdata fails for more than half a day: one Giovanni CSV per region with `import-giovanni --activate`. | `services/nasa/fetch_imerg.py` | `python -m app.cli status` shows `earthaccess` for all regions |
+| A3 | **Check every study box on a map.** Each centre cell must contain the city and the 3 x 3 box should be mostly land. Set `verified: true` per region; move a centre by one cell if needed. Add `data/regions/cameroon_admin1.geojson` (10 regions, simplified, with source and licence noted) for B's map. | `data/regions/` | All ten `verified: true`; GeoJSON committed (< 500 kB) |
+| A4 | **Cross-check against Giovanni.** For Douala, compare one month of the 3 x 3 box mean with Giovanni's area average. | `tests/test_nasa_crosscheck.py` (skips if the CSV is absent) | Difference < 1%, numbers in the issue |
+| A5 | **Ship the data with the repo.** The SQLite file is gitignored. Add `python -m app.cli export` (observations + sources to `data/processed/observations.csv.gz`) and `python -m app.cli load` (rebuild the database from it). The server loads it on start-up if the database is empty. | `cli.py`, `models/database.py`, `main.py` | Fresh clone + `load` gives the same `/api/analysis/trends` answer |
+| A6 | **Validate the statistics.** Run `backend/scripts/check_mann_kendall.py` for every region on real data. Add a test comparing Hamed-Rao against a published or hand-computed reference value. | `services/analytics/`, `tests/test_analytics_*.py` | MATCH for all regions; new test green |
+| A7 | **Results note for B.** One short paragraph per region: verdict, slope, CI, Pettitt year, anything surprising. B uses it to check the AI text and to write the demo. | issue comment | Posted after A2 |
+| A8 | *Should:* GPCP V3.3 as a sensitivity row (different product, never joined to IMERG). | `services/nasa/fetch_gpcp.py`, `services/analytics/trends.py` | GPCP row appears in `sensitivity` |
+| A9 | **Deploy the backend** (Render or Railway free tier). Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT` from `backend/`. Set `CORS_ORIGINS` to the frontend URL, `GEMINI_API_KEY` as a secret. | `render.yaml` or equivalent, `README.md` | Public `/api/health` returns `is_mock: false` |
 
-Target times inside a gate are in the role prompts. If a prompt and this table disagree, this table wins.
+### Developer B: Frontend & AI
 
-## 5. Who waits for whom (and how not to wait)
+| # | Task | Files | Done when |
+| --- | --- | --- | --- |
+| B1 | **Run the app locally on mock data** and read every page. List what is wrong or missing in the issue. | none | Issue with the list |
+| B2 | **Design rebuild.** Keep the four pages and the data flow; redesign the look. Mobile first (test at 360 px), one consistent type scale, colour meaning fixed (brown drier, blue wetter, purple 2014), dark mode optional. Use `frontend/src/styles.css` as the starting point or replace it. | `frontend/src/**` | Screenshots at 360 px and 1280 px in the pull request |
+| B3 | **Dashboard: compare regions.** A small table or map of all ten regions with their verdict (call `/api/analysis/trends` per region, or ask A for a batch endpoint through a contract issue). | `pages/Dashboard.tsx`, `components/dashboard/` | All regions visible with verdict and slope |
+| B4 | **Explorer: real map.** Draw the Cameroon outline and regions from A3's GeoJSON, a colour legend for the per-cell slopes, and a clearer headline-box outline. | `components/maps/`, `pages/Explorer.tsx` | Map readable without tiles (tiles can fail offline) |
+| B5 | **Accessibility and states.** Every chart has a text alternative and a data table; keyboard navigation works; loading, empty, error and "no data for this region" states are designed. | `components/**` | Lighthouse accessibility score >= 90 |
+| B6 | **Method page.** A fifth page that renders the plain-language method (`docs/methodology.md`, sections "Plain-language method" and "What the AI does"). | `pages/Method.tsx` | Linked from the footer and nav |
+| B7 | **AI on real data.** Run `python -m app.services.ai.interpreter --eval --llm` (add 3-limitation inland cases to the fixtures). Check the Gemini text for each region against A7's note. Update `docs/ai-eval.md`. | `services/ai/`, `tests/fixtures/`, `tests/test_ai_interpreter.py` | All eval cases pass checks; eval table updated |
+| B8 | **Cache Gemini answers.** Store accepted rewrites in SQLite keyed by region, period and a hash of the analysis, so a page view never waits for Gemini twice. Add the table through a short PR reviewed by A. | `services/ai/`, `models/database.py` (with A) | Second call returns instantly with `source: gemini` |
+| B9 | *Should:* free-text question box in the Assistant. The model may only answer from the analysis JSON, and its answer passes the same number, claim and direction checks; otherwise show "I can only answer from the computed results." | `services/ai/`, `routes/assistant.py`, `schemas/ai.py`, `pages/Assistant.tsx` | Six adversarial questions in tests are refused or answered within the checks |
+| B10 | **Frontend tests and bundle.** Vitest + Testing Library for the API client and two pages; split Recharts and Leaflet into their own chunks. | `frontend/` | `npm test` green in CI; main chunk < 300 kB |
+| B11 | **Deploy the frontend** (Vercel, Netlify or GitHub Pages) with `VITE_API_URL` set to A9's backend. | `.github/workflows/pages.yml` or host config | Public URL works from a phone |
+| B12 | **Two outsider tests.** Watch two people who have never seen the app answer "Is it getting wetter in Garoua?" Fix what confuses them. | any | Notes in the issue |
+
+## 4. Order and hand-offs
 
 ```
-Data #8 -> #9 -> Processing #14 (real) -> Analytics #17 (real) -> AI #20/#21 (real) -> Frontend #25
+A1 -> A2 -> A7 ------------------> B7 (AI text checked on real numbers)
+       |-> A3 (GeoJSON) --------> B4 (map)
+       |-> A5 -> A9 (backend) --> B11 (frontend deploy needs the API URL)
+B1 -> B2 -> B3, B5, B6 (all on mock data, no waiting)
 ```
 
-Data does #10 (the Giovanni download, about 30 minutes) right after the spike #8 and before the full fetch #9: it already gives the headline box and makes plan B real before the slow step starts.
+Nobody waits: the mock database has the same shape as the real one, so B builds everything on mock
+data while A brings in NASA data. When A2 merges, B reloads and sees real numbers with no code change.
 
-Nobody waits: fixtures in `web/public/data/` and `make mock` exist from G0, so every module is built and tested on mock data first, then switched to real data when the upstream handoff arrives.
+### Milestones
 
-## 6. Daily rhythm
-
-- **Standups (10 minutes, everyone, in person or call):** Sat 14:30, 17:00, 19:00, 21:00, 23:00; Sun 08:30, 12:00, 15:00, 17:30. Each person: done, next, blocked. Decisions go in the issue, not only in chat.
-- **Team chat (WhatsApp):** blockers, handoffs, gate status. Nothing else.
-- **Handoff message** (post in chat and as an issue comment):
-  `HANDOFF #<issue>: <file> is now <mock|real> on main (PR #<n>). Next: <role>.`
-- **Build message** (Lead, after regenerating the outputs):
-  `BUILD: outputs regenerated on main (PR #<n>), is_mock=<true|false>.`
-  A handoff means your code is merged. Downstream owners switch to real data after the next build message.
-- **Blocked more than 45 minutes:** say it in chat; the Lead reassigns or switches to the fallback.
-- **Sleep:** at least 6 hours each, in shifts. Nobody merges pipeline changes alone at night.
-
-## 7. Git rules
-
-1. Never commit to `main`; it is protected.
-2. One branch per issue: `feature/<area>-<issue#>-<slug>`.
-3. Rebase on `origin/main`, run `make test` (without `make`: `python -m pytest -q`), then open a pull request with the template filled and `Closes #n`.
-4. CI must be green. The Lead merges (or a second teammate if the Lead is busy for more than 30 minutes).
-5. Merge at least every 3 hours. Small pull requests beat big ones.
-6. Edit only your own files. Contract changes go through an issue labelled `contract`.
-
-## 8. Fallbacks (decided in advance, no debate)
-
-| Trigger | Fallback | Who decides |
+| Milestone | Contents | Definition of done |
 | --- | --- | --- |
-| Sat 18:00 and no real data from plan A | Plan B: Giovanni CSV for `box_3x3` (`make giovanni FILE=... ACTIVATE=1`); trend map marked unavailable | Data + Lead |
-| December 2025 granule not published | `END_YEAR = 2024` | Data tells Processing |
-| Gemini key missing, quota hit, or checks fail | Ship the template explanation | AI |
-| GitHub Pages fails | Deploy `web/dist` to Vercel or Netlify | Lead |
-| A teammate is absent or stuck | Lead reassigns the issue; Data and Processing merge first | Lead |
-| A module is late at G2 | Ship without it if it is a "should"; otherwise everyone helps the owner | Lead |
+| M1: Real data | A1, A2, A3, B1, B2 started | `status` shows real data for all regions; B has a design draft |
+| M2: Trustworthy results | A4, A5, A6, A7, B2, B3, B5 | Statistics validated; redesigned pages on real data |
+| M3: Complete product | A9, B4, B6, B7, B8, B11 | Both halves deployed; AI checked on real results |
+| M4: Polish | A8, B9, B10, B12 | Optional items, outsider tests fixed |
 
-## 9. Definition of done for any issue
+The first concrete milestone is a complete rainfall investigation on real NASA data. Everything else
+is secondary until that works.
 
-Code merged on `main`, tests added and green in CI, outputs match `docs/CONTRACT.md`, handoff posted, issue closed.
+## 5. How we work
+
+- One repository, `main` protected, one branch per task, pull request reviewed by the other developer.
+- Rebase on `origin/main`, run `python -m pytest -q` (and `npm run build` in `frontend/` for B), then
+  open the pull request with `Closes #<n>`.
+- Contract changes (a field added, renamed or removed in any response) touch the three contract files
+  in one pull request and need both developers' approval.
+- Short daily check-in (10 minutes): done, next, blocked. Blocked for more than 45 minutes: say so.
+- Secrets live only in `.env` (gitignored). Never commit keys or passwords.
+
+## 6. Out of scope for the MVP
+
+Forecasting, other climate variables, machine-learning models, user accounts, a production database,
+several NASA products joined into one series, anomaly detection.

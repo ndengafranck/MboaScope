@@ -1,9 +1,18 @@
+# secrets
 .env
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# node
+node_modules/
+frontend/dist/
+
+# data: the database is rebuilt with `python -m app.cli seed-mock` or a NASA import
+data/processed/*.db
+data/processed/*.db-journal
 data/raw/*
 !data/raw/.gitkeep
-node_modules/
-web/dist/
-__pycache__/
-.venv/
-*.pyc
-.pytest_cache/
