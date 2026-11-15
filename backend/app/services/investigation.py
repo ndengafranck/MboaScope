@@ -16,7 +16,9 @@ from app.models import database as db
 from app.services.analytics import trends
 from app.services.gis.regions import Region, get_region
 from app.services.gis.spatial import RegionAnnual, build_region_annual
-from app.services.nasa.precipitation import load_region_input
+from app.services.gis.spatial import to_annual
+from app.services.nasa import fetch_gpcp
+from app.services.nasa.precipitation import load_gpcp_monthly, load_region_input
 
 
 @dataclass
@@ -65,6 +67,10 @@ def _run_cached(region_id: str, start_year: int, end_year: int, _data_version: s
         analysis = {"headline": trends.build_headline(annual), "sensitivity": trends.build_sensitivity(annual)}
     except ValueError:
         analysis = None
+    if analysis is not None and data.kind == "region":
+        row = gpcp_row(region_id, start_year, end_year)
+        if row is not None:
+            analysis["sensitivity"].append(row)
     return Investigation(
         region=region,
         start_year=start_year,
@@ -74,6 +80,15 @@ def _run_cached(region_id: str, start_year: int, end_year: int, _data_version: s
         analysis=analysis,
         spatial=trends.build_spatial(annual.cells),
     )
+
+
+def gpcp_row(region_id: str, start_year: int, end_year: int) -> dict | None:
+    """Sensitivity row from GPCP V3.3 (task A8). A different product: never joined to IMERG."""
+    monthly = load_gpcp_monthly(region_id, fetch_gpcp.BOX)
+    if monthly is None:
+        return None
+    monthly = monthly[(monthly["year"] >= start_year) & (monthly["year"] <= end_year)]
+    return trends.sensitivity_row(fetch_gpcp.BOX, fetch_gpcp.GPCP["label"], to_annual(monthly))
 
 
 def require_analysis(inv: Investigation) -> dict:

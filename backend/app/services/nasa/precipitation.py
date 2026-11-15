@@ -60,3 +60,12 @@ def load_region_input(region_id: str, db_path: Path | None = None) -> RegionInpu
     if raw.empty:
         raise NoDataForRegion(f"{region_id}: sources says {method} but no rows are stored")
     return RegionInput(kind=kind, monthly=add_mm(raw), source=source)
+
+
+def load_gpcp_monthly(region_id: str, box: str, db_path: Path | None = None) -> pd.DataFrame | None:
+    """GPCP cross-check rows for a region as monthly totals (month, year, mm), or None if absent."""
+    raw = db.read_box_observations(region_id, db_path)
+    raw = raw[raw["box"] == box]
+    if raw.empty:
+        return None
+    return add_mm(raw)[["month", "year", "mm"]]

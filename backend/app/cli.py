@@ -3,6 +3,7 @@
   seed-mock        [--region ID ...]                 synthetic data so nobody waits
   inspect-granule  [--month YYYY-MM] [--download]    spike: one real IMERG granule
   fetch-imerg      [--region ID ...] [--limit N] [--download]   real per-cell data (plan A)
+  fetch-gpcp       [--region ID ...] [--limit N]     GPCP V3.3 sensitivity row (A8)
   import-giovanni  FILE --region ID [--activate]     Giovanni box CSV (plan B)
   status                                             what is in the database
   export           [--to DIR]                        write the data to data/processed/ (committed)
@@ -35,6 +36,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--end")
     p.add_argument("--limit", type=int)
     p.add_argument("--download", action="store_true", help="save whole files in data/raw/imerg/ (resumable)")
+
+    p = sub.add_parser("fetch-gpcp")
+    p.add_argument("--region", action="append")
+    p.add_argument("--start")
+    p.add_argument("--end")
+    p.add_argument("--limit", type=int)
 
     p = sub.add_parser("import-giovanni")
     p.add_argument("file", type=Path)
@@ -72,6 +79,12 @@ def main(argv: list[str] | None = None) -> int:
         kwargs = {k: v for k, v in {"start": args.start, "end": args.end}.items() if v}
         for rid, n in fetch_imerg.fetch(args.region, limit=args.limit, download=args.download, **kwargs).items():
             print(f"fetch-imerg: {rid}: {n} rows stored")
+    elif args.cmd == "fetch-gpcp":
+        from app.services.nasa import fetch_gpcp
+
+        kwargs = {k: v for k, v in {"start": args.start, "end": args.end}.items() if v}
+        for rid, n in fetch_gpcp.fetch(args.region, limit=args.limit, **kwargs).items():
+            print(f"fetch-gpcp: {rid}: {n} months stored")
     elif args.cmd == "import-giovanni":
         from app.services.gis.regions import get_region
         from app.services.nasa import giovanni

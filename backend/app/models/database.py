@@ -103,6 +103,17 @@ def replace_box_observations(region_id: str, rows: list[dict], db_path: Path | N
     return len(rows)
 
 
+def replace_box_rows(region_id: str, box: str, rows: list[dict], db_path: Path | None = None) -> int:
+    """Replace one box of a region (e.g. the GPCP cross-check), leaving the other boxes alone."""
+    with connect(db_path) as conn:
+        conn.execute("DELETE FROM box_observations WHERE region_id = ? AND box = ?", (region_id, box))
+        conn.executemany(
+            "INSERT INTO box_observations VALUES (?, ?, ?, ?, ?)",
+            [(region_id, r["month"], box, float(r["rate"]), r["units"]) for r in rows],
+        )
+    return len(rows)
+
+
 def upsert_source(region_id: str, source: dict[str, Any], db_path: Path | None = None) -> None:
     with connect(db_path) as conn:
         conn.execute(

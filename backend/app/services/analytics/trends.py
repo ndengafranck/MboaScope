@@ -134,20 +134,27 @@ def build_sensitivity(ra: RegionAnnual) -> list[dict]:
     for box in SENSITIVITY_BOXES:
         if box not in ra.boxes:
             continue
-        sub = complete_only(ra.boxes[box])
-        if len(sub) < stats.MIN_N:
-            continue
-        a = analyse_series(sub["year"].to_numpy(), sub["total_mm"].to_numpy())
-        rows.append({
-            "box": box,
-            "dataset": DATASET["label"],
-            "n_years": a["n"],
-            "p": round(a["p"], 3),
-            "sen_slope_mm_per_year": round(a["slope"], 1),
-            "sen_ci95": [round(a["low"], 1), round(a["high"], 1)],
-            "verdict": a["verdict"],
-        })
+        row = sensitivity_row(box, DATASET["label"], ra.boxes[box])
+        if row is not None:
+            rows.append(row)
     return rows
+
+
+def sensitivity_row(box: str, dataset: str, annual: pd.DataFrame) -> dict | None:
+    """One robustness row from an annual frame (year, total_mm, complete). None if too few years."""
+    sub = complete_only(annual)
+    if len(sub) < stats.MIN_N:
+        return None
+    a = analyse_series(sub["year"].to_numpy(), sub["total_mm"].to_numpy())
+    return {
+        "box": box,
+        "dataset": dataset,
+        "n_years": a["n"],
+        "p": round(a["p"], 3),
+        "sen_slope_mm_per_year": round(a["slope"], 1),
+        "sen_ci95": [round(a["low"], 1), round(a["high"], 1)],
+        "verdict": a["verdict"],
+    }
 
 
 def build_spatial(cells: pd.DataFrame | None) -> dict:
