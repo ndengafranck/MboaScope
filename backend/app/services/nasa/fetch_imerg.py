@@ -1,6 +1,6 @@
 """Fetch IMERG V07 monthly per-cell rates for the study regions (plan A). Owner: Developer A (task A1).
 
-CLI: python -m app.cli fetch-imerg [--region douala ...] [--start 2001-01] [--end 2025-12] [--limit N]
+CLI: python -m app.cli fetch-imerg [--region douala ...] [--start 2001-01] [--end 2024-12] [--limit N]
 
 STATUS: written from the GES DISC file layout but NOT yet run against NASA.
 Task A1 starts with `python -m app.cli inspect-granule` on one granule to confirm

@@ -1,6 +1,6 @@
 """Spike: open ONE IMERG monthly granule and print its structure. Owner: Developer A (task A1).
 
-CLI: python -m app.cli inspect-granule [--month 2025-12]
+CLI: python -m app.cli inspect-granule [--month 2024-12]
 
 Confirms before the full fetch: the HDF5 group and variable names, dimension
 order (time, lon, lat), the units attribute, the fill value, and that the
@@ -22,7 +22,10 @@ def inspect(month: str = f"{END_YEAR}-12") -> None:
         short_name=DATASET["short_name"], version=DATASET["version"], temporal=(f"{month}-01", f"{month}-28")
     )
     if not results:
-        print(f"inspect: no granule for {month}. If this is December {END_YEAR}, set END_YEAR = {END_YEAR - 1}.")
+        print(
+            f"inspect: no {DATASET['short_name']} v{DATASET['version']} granule for {month}. "
+            "V07 Final stops in 2025 (NASA is moving IMERG to V08); try an earlier month."
+        )
         return
     print("inspect: granule", results[0].data_links()[0])
     handle = earthaccess.open(results[:1])[0]
