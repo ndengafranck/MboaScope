@@ -1,6 +1,7 @@
 """Template explanation with number, claim and direction checks.
 
-CLI: python -m pipeline.explain (make explain). Owner: AI (issue #20).
+CLI: python -m pipeline.explain [--llm] [--eval] (make explain, make explain LLM=1).
+Owner: AI (issues #20 and #21).
 
 The AI layer never computes or decides anything. It only words numbers that
 analysis.json already contains, and every field is checked before it is saved:
@@ -10,6 +11,11 @@ analysis.json already contains, and every field is checked before it is saved:
 - claim check: no banned wording from docs/SCIENCE.md (cause, proof, "stable",
   station, forecast and so on), in any field, negated or not;
 - direction check: the wording cannot contradict the verdict.
+
+With --llm, Gemini may reword three fields (never the summary). The rewrite is
+kept only if every check passes; otherwise the template is saved. Without
+--llm, an existing Gemini file is kept if it still passes against the current
+analysis.json, so `make build` does not erase it.
 """
 from __future__ import annotations
 
@@ -353,6 +359,174 @@ def assert_checks(explanation: dict[str, Any], analysis: dict[str, Any]) -> None
         raise CheckError(problems)
 
 
+# ---------------------------------------------------------------- Gemini (#21)
+
+PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "rewrite.md"
+FIXTURES = Path(__file__).resolve().parent.parent / "tests" / "fixtures"
+DEFAULT_MODEL = "gemini-3.6-flash"
+TEMPERATURE = 0.2
+MAX_WORDS = 120
+LLM_FIELDS = ("what_it_means", "what_it_does_not_mean", "limitations")
+EVAL_CASES = (
+    "increase",
+    "increase_pettitt2014",
+    "decrease",
+    "decrease_pettitt2014",
+    "no_trend",
+    "no_trend_pettitt2014",
+)
+
+# Words a rewrite must keep so that no caveat is dropped or softened.
+CAVEAT_KEYWORDS = {
+    "sensor_change_2014": ("2014", "TRMM", "GPM"),
+    "coastal_skill": ("coast",),
+    "short_record": ("power",),
+    "area_estimate": ("average",),
+}
+
+
+def build_prompt(analysis: dict[str, Any], template: dict[str, Any]) -> str:
+    """The rewrite prompt with the analysis JSON and the template text filled in."""
+    body = {k: v for k, v in analysis.items() if k not in ("generated_at",)}
+    return (
+        PROMPT_PATH.read_text(encoding="utf-8")
+        .replace("{{ANALYSIS_JSON}}", json.dumps(body, indent=2))
+        .replace("{{TEMPLATE_JSON}}", json.dumps(template, indent=2, ensure_ascii=False))
+    )
+
+
+def parse_llm_json(text: str) -> dict[str, Any]:
+    """Read the model's JSON answer, tolerating a markdown code fence."""
+    cleaned = text.strip()
+    fence = re.match(r"^```(?:json)?\s*(.*?)\s*```$", cleaned, flags=re.DOTALL)
+    if fence:
+        cleaned = fence.group(1)
+    data = json.loads(cleaned)
+    if not isinstance(data, dict):
+        raise ValueError("model answer is not a JSON object")
+    return data
+
+
+def check_rewrite(fields: dict[str, Any], template: dict[str, Any], analysis: dict[str, Any]) -> list[str]:
+    """Extra checks for a model rewrite, on top of run_checks."""
+    problems = []
+    if fields.get("summary") != template["summary"]:
+        problems.append("summary must stay the template text")
+    for field in LLM_FIELDS:
+        value = fields.get(field)
+        text = " ".join(value) if isinstance(value, list) else str(value or "")
+        words = len(text.split())
+        if words > MAX_WORDS:
+            problems.append(f"{field} has {words} words (max {MAX_WORDS})")
+    lims = " ".join(fields.get("limitations") or []).lower()
+    for code in analysis["headline"]["caveats"]:
+        for word in CAVEAT_KEYWORDS.get(code, ()):
+            if word.lower() not in lims:
+                problems.append(f"limitations lost caveat {code} (missing {word!r})")
+    if PETTITT_2014_SENTENCE in template["what_it_means"]:
+        if "artifact" not in str(fields.get("what_it_means", "")).lower():
+            problems.append("what_it_means lost the 2014 artifact warning")
+    if "\u2014" in all_text(fields):
+        problems.append("em dash in text")
+    return problems
+
+
+def pick_flash_model(names: Iterable[str]) -> str | None:
+    """Pick the newest general Gemini Flash model from a list of model names."""
+    skip = ("lite", "image", "tts", "live", "audio", "embedding", "thinking", "8b", "exp")
+
+    def version(name: str) -> tuple[float, int]:
+        match = re.search(r"gemini-(\d+(?:\.\d+)?)-flash", name)
+        stable = 0 if "preview" in name else 1
+        return (float(match.group(1)) if match else 0.0, stable)
+
+    candidates = [
+        n.removeprefix("models/")
+        for n in names
+        if "flash" in n and "gemini" in n and not any(s in n for s in skip)
+    ]
+    if not candidates:
+        return None
+    return max(candidates, key=version)
+
+
+def call_gemini(prompt: str, model: str, api_key: str) -> tuple[str, str]:
+    """Send the prompt to Gemini. Returns (answer text, model name used)."""
+    from google import genai  # imported here so CI and the template never need it
+    from google.genai import errors, types
+
+    client = genai.Client(api_key=api_key)
+    config = types.GenerateContentConfig(temperature=TEMPERATURE, response_mime_type="application/json")
+
+    def generate(name: str) -> tuple[str, str]:
+        response = client.models.generate_content(model=name, contents=prompt, config=config)
+        return response.text or "", response.model_version or name
+
+    try:
+        return generate(model)
+    except errors.ClientError as err:
+        if getattr(err, "code", None) not in (400, 404):
+            raise
+        names = [
+            m.name
+            for m in client.models.list()
+            if m.name and "generateContent" in (m.supported_actions or ["generateContent"])
+        ]
+        fallback = pick_flash_model(names)
+        if not fallback or fallback == model:
+            raise
+        print(f"explain: model {model!r} rejected, using {fallback!r} instead", file=sys.stderr)
+        return generate(fallback)
+
+
+def rewrite_with_llm(
+    analysis: dict[str, Any],
+    template: dict[str, Any],
+    call: Any,
+) -> tuple[dict[str, Any], list[str]]:
+    """Ask the model for a rewrite and check it.
+
+    `call(prompt) -> (text, model)` does the API call (a fake in tests).
+    Returns the payload to save and the reasons the rewrite was rejected
+    (empty when the Gemini text is kept). Any failure falls back to the template.
+    """
+    fallback = {"source": "template", "model": None, "checks_passed": True, **template}
+    try:
+        text, model = call(build_prompt(analysis, template))
+        answer = parse_llm_json(text)
+    except Exception as err:  # any API or parsing error means: ship the template
+        return fallback, [f"gemini error: {type(err).__name__}: {err}"]
+    fields = {"summary": template["summary"], **{k: answer.get(k) for k in LLM_FIELDS}}
+    problems = run_checks(fields, analysis)
+    if not problems:
+        problems = check_rewrite(fields, template, analysis)
+    if problems:
+        return fallback, problems
+    return {"source": "gemini", "model": model, "checks_passed": True, **fields}, []
+
+
+def keep_existing_rewrite(existing: dict[str, Any] | None, analysis: dict[str, Any]) -> list[str]:
+    """Reasons not to keep an existing Gemini file (empty list: keep it)."""
+    if not existing or existing.get("source") != "gemini":
+        return ["no gemini file"]
+    if existing.get("is_mock") != bool(analysis.get("is_mock", True)):
+        return ["is_mock differs from analysis.json"]
+    problems = check_shape(existing)
+    if problems:
+        return problems
+    template = build_template(analysis)
+    return run_checks(existing, analysis) or check_rewrite(existing, template, analysis)
+
+
+def _gemini_settings() -> tuple[str, str]:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+    import os
+
+    return os.environ.get("GEMINI_API_KEY", "").strip(), os.environ.get("GEMINI_MODEL", "").strip() or DEFAULT_MODEL
+
+
 # ---------------------------------------------------------------- CLI
 
 
@@ -368,16 +542,91 @@ def explain(analysis: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
     return payload, problems
 
 
+def _make_caller(api_key: str, model: str):
+    def call(prompt: str) -> tuple[str, str]:
+        return call_gemini(prompt, model, api_key)
+
+    return call
+
+
+def run_eval(use_llm: bool) -> int:
+    """Print the 6-case evaluation as markdown, ready to paste in issue #21."""
+    api_key, model = _gemini_settings()
+    if use_llm and not api_key:
+        print("explain: GEMINI_API_KEY is not set in .env", file=sys.stderr)
+        return 1
+    call = _make_caller(api_key, model) if use_llm else None
+    rows, details = [], []
+    for case in EVAL_CASES:
+        analysis = read_json(FIXTURES / f"analysis_{case}.json")
+        payload, problems = explain(analysis)
+        why = "; ".join(problems)
+        if use_llm and not problems:
+            payload, problems = rewrite_with_llm(analysis, build_template(analysis), call)
+            why = "; ".join(problems)
+        passed = "yes" if payload["source"] == ("gemini" if use_llm else "template") and not problems else "no"
+        rows.append(f"| {case} | {payload['source']} | {payload['model'] or '-'} | {passed} | {why or '-'} | |")
+        details.append(
+            f"### {case} ({payload['source']})\n\n"
+            f"**what_it_means:** {payload['what_it_means']}\n\n"
+            f"**what_it_does_not_mean:** {payload['what_it_does_not_mean']}\n\n"
+            "**limitations:**\n" + "\n".join(f"- {s}" for s in payload["limitations"]) + "\n"
+        )
+    print("| case | source | model | checks passed | rejection reason | clarity 1-5 |")
+    print("| --- | --- | --- | --- | --- | --- |")
+    print("\n".join(rows))
+    print()
+    print("\n".join(details))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(prog="python -m pipeline.explain", description=__doc__.splitlines()[0])
+    parser.add_argument("--llm", action="store_true", help="ask Gemini for a rewrite (local only, never in CI)")
+    parser.add_argument("--eval", action="store_true", help="run the 6 fixture cases and print a markdown report")
+    args = parser.parse_args(argv)
+
+    if args.eval:
+        return run_eval(args.llm)
+
     analysis = read_json(ANALYSIS_PATH)
+    is_mock = bool(analysis.get("is_mock", True))
     payload, problems = explain(analysis)
-    write_json(EXPLANATION_PATH, payload, bool(analysis.get("is_mock", True)))
     if problems:
         # The template should never fail. If it does, the file is still written
         # with checks_passed false so the site can hide it, and the build stops.
+        write_json(EXPLANATION_PATH, payload, is_mock)
         for problem in problems:
             print(f"explain: check failed: {problem}", file=sys.stderr)
         return 1
+    template = {k: payload[k] for k in FIELDS}
+
+    if args.llm:
+        api_key, model = _gemini_settings()
+        if not api_key:
+            payload, reasons = payload, ["GEMINI_API_KEY is not set in .env"]
+        else:
+            payload, reasons = rewrite_with_llm(analysis, template, _make_caller(api_key, model))
+        write_json(EXPLANATION_PATH, payload, is_mock)
+        if reasons:
+            for reason in reasons:
+                print(f"explain: gemini rewrite rejected: {reason}", file=sys.stderr)
+            print(f"explain: wrote {EXPLANATION_PATH} (source template, checks passed)")
+        else:
+            print(f"explain: wrote {EXPLANATION_PATH} (source gemini, model {payload['model']}, checks passed)")
+        return 0
+
+    existing = read_json(EXPLANATION_PATH) if EXPLANATION_PATH.exists() else None
+    if existing and existing.get("source") == "gemini":
+        reasons = keep_existing_rewrite(existing, analysis)
+        if not reasons:
+            print(f"explain: kept existing gemini rewrite in {EXPLANATION_PATH} (checks still pass)")
+            return 0
+        for reason in reasons:
+            print(f"explain: existing gemini rewrite replaced: {reason}", file=sys.stderr)
+    write_json(EXPLANATION_PATH, payload, is_mock)
     print(f"explain: wrote {EXPLANATION_PATH} (source template, checks passed)")
     return 0
 
