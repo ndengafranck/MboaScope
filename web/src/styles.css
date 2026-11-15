@@ -467,6 +467,141 @@ h3 {
   font-size: 15px;
 }
 
+.map {
+  margin: 14px 0 0;
+}
+
+.map-frame {
+  height: 360px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--neutral-bg);
+}
+
+.leaflet-box {
+  height: 100%;
+  width: 100%;
+  font: 13px/1.4 var(--sans);
+}
+
+.leaflet-box .leaflet-control-zoom a {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 20px;
+}
+
+.map-loading {
+  height: 100%;
+  margin: 0 !important;
+  display: grid;
+  place-items: center;
+}
+
+.map-key {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.legend-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 0 0 6px !important;
+}
+
+.legend-bar {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgb(135, 71, 15), rgb(241, 241, 236) 50%, rgb(29, 92, 150));
+  border: 1px solid var(--rule);
+}
+
+.legend-ends {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.legend-ends span:first-child {
+  color: var(--drier);
+}
+
+.legend-ends .right {
+  text-align: right;
+  color: var(--wetter);
+}
+
+.legend-ends .center {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.legend-num {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+.legend-sig {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0 !important;
+  color: var(--ink-2);
+}
+
+.swatch-sig {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--ink);
+  background: var(--neutral-bg);
+  flex: none;
+}
+
+.box-key {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.box-key li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.swatch-box {
+  width: 22px;
+  height: 14px;
+  border: 1.5px dashed #334155;
+  flex: none;
+}
+
+.box-key .is-headline {
+  font-weight: 600;
+}
+
+.box-key .is-headline .swatch-box {
+  border: 3.5px solid var(--ink);
+}
+
+@media (min-width: 600px) {
+  .map-frame {
+    height: 440px;
+  }
+}
+
 /* 6. Robustness: stacked cards on phones, a real table from 600 px */
 @media (max-width: 599px) {
   .table-scroll {
