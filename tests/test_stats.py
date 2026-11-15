@@ -69,6 +69,6 @@ def test_hand_computed_mann_kendall():
     z10 = (s10 - 1) / math.sqrt(var10)
     p10 = 2 * (1 - 0.5 * (1 + math.erf(abs(z10) / math.sqrt(2))))
     r = stats.mk_original(x10)
-    assert r["S"] == s10
+    assert r["s"] == s10
     assert r["z"] == pytest.approx(z10, abs=1e-9)
     assert r["p"] == pytest.approx(p10, abs=1e-9)
