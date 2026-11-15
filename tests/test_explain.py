@@ -296,3 +296,238 @@ def test_fixtures_are_not_mutated():
     ex.build_template(analysis)
     ex.run_checks(ex.build_template(analysis), analysis)
     assert analysis == before
+
+
+# ------------------------------------------------------------ Gemini rewrite (#21), no network
+
+
+def good_rewrite(template: dict) -> dict:
+    """A plausible model answer: reworded, same numbers, same caveats."""
+    return {
+        "what_it_means": template["what_it_means"].replace("We used", "The team used"),
+        "what_it_does_not_mean": template["what_it_does_not_mean"].replace("This result", "The result"),
+        "limitations": [s.replace("The ", "These ", 1) if s.startswith("The numbers") else s for s in template["limitations"]],
+    }
+
+
+def fake_call(answer, model="gemini-test-flash"):
+    def call(prompt: str):
+        assert "{{" not in prompt, "prompt placeholders were not filled"
+        return (answer if isinstance(answer, str) else json.dumps(answer)), model
+
+    return call
+
+
+@pytest.mark.parametrize("name", CASES)
+def test_good_rewrite_is_kept(name):
+    analysis = load(name)
+    template = ex.build_template(analysis)
+    payload, reasons = ex.rewrite_with_llm(analysis, template, fake_call(good_rewrite(template)))
+    assert reasons == []
+    assert payload["source"] == "gemini"
+    assert payload["model"] == "gemini-test-flash"
+    assert payload["checks_passed"] is True
+    assert payload["summary"] == template["summary"]
+
+
+def test_rewrite_with_code_fence_is_parsed():
+    analysis = load("no_trend")
+    template = ex.build_template(analysis)
+    answer = "```json\n" + json.dumps(good_rewrite(template)) + "\n```"
+    payload, reasons = ex.rewrite_with_llm(analysis, template, fake_call(answer))
+    assert reasons == [] and payload["source"] == "gemini"
+
+
+@pytest.mark.parametrize(
+    "mutate, reason",
+    [
+        (lambda a: a.update(what_it_means=a["what_it_means"] + " That is 12.3 mm."), "number"),
+        (lambda a: a.update(what_it_means=a["what_it_means"] + " Rainfall is stable."), "banned"),
+        (lambda a: a.update(what_it_means=a["what_it_means"] + " It got drier."), "direction"),
+        (lambda a: a.update(limitations=a["limitations"][:3]), "limitations"),
+        (lambda a: a.update(limitations=[a["limitations"][1], a["limitations"][2], a["limitations"][3], "Coverage varies."]), "caveat"),
+        (lambda a: a.update(what_it_does_not_mean="word " * 121), "words"),
+        (lambda a: a.update(what_it_means=a["what_it_means"].replace("artifact", "oddity")), "artifact"),
+        (lambda a: a.update(what_it_means=a["what_it_means"] + " Plain \u2014 text."), "em dash"),
+    ],
+)
+def test_bad_rewrite_falls_back_to_template(mutate, reason):
+    analysis = load("increase_pettitt2014")
+    template = ex.build_template(analysis)
+    answer = good_rewrite(template)
+    mutate(answer)
+    payload, reasons = ex.rewrite_with_llm(analysis, template, fake_call(answer))
+    assert payload["source"] == "template"
+    assert payload["model"] is None
+    assert payload["what_it_means"] == template["what_it_means"]
+    assert reasons
+    assert reason in " ".join(reasons)
+
+
+def test_rewrite_cannot_change_summary():
+    analysis = load("no_trend")
+    template = ex.build_template(analysis)
+    answer = {**good_rewrite(template), "summary": "Something else entirely."}
+    payload, _ = ex.rewrite_with_llm(analysis, template, fake_call(answer))
+    assert payload["summary"] == template["summary"]
+
+
+@pytest.mark.parametrize("answer", ["not json", "[1, 2]", ""])
+def test_unparseable_answer_falls_back(answer):
+    analysis = load("no_trend")
+    template = ex.build_template(analysis)
+    payload, reasons = ex.rewrite_with_llm(analysis, template, fake_call(answer))
+    assert payload["source"] == "template" and "gemini error" in reasons[0]
+
+
+def test_api_error_falls_back():
+    def boom(prompt):
+        raise RuntimeError("quota exceeded")
+
+    analysis = load("no_trend")
+    template = ex.build_template(analysis)
+    payload, reasons = ex.rewrite_with_llm(analysis, template, boom)
+    assert payload["source"] == "template"
+    assert "quota exceeded" in reasons[0]
+
+
+def test_prompt_contains_only_analysis_and_template():
+    analysis = load("decrease")
+    template = ex.build_template(analysis)
+    prompt = ex.build_prompt(analysis, template)
+    assert template["summary"] in prompt
+    assert '"verdict": "significant_decrease"' in prompt
+    assert "{{" not in prompt
+
+
+@pytest.mark.parametrize(
+    "names, expected",
+    [
+        (["models/gemini-2.0-flash", "models/gemini-2.5-flash", "models/gemini-2.5-pro"], "gemini-2.5-flash"),
+        (["models/gemini-2.5-flash", "models/gemini-3.0-flash-preview", "models/gemini-3.0-flash"], "gemini-3.0-flash"),
+        (["models/gemini-2.5-flash-lite", "models/gemini-2.5-flash-image", "models/gemini-2.0-flash"], "gemini-2.0-flash"),
+        (["models/gemini-2.5-pro"], None),
+    ],
+)
+def test_pick_flash_model(names, expected):
+    assert ex.pick_flash_model(names) == expected
+
+
+# ------------------------------------------------------------ keep an existing rewrite without --llm
+
+
+def _run_main(tmp_path, monkeypatch, analysis, existing=None, argv=None):
+    analysis_path = tmp_path / "analysis.json"
+    out_path = tmp_path / "explanation.json"
+    analysis_path.write_text(json.dumps(analysis), encoding="utf-8")
+    if existing is not None:
+        out_path.write_text(json.dumps(existing), encoding="utf-8")
+    monkeypatch.setattr(ex, "ANALYSIS_PATH", analysis_path)
+    monkeypatch.setattr(ex, "EXPLANATION_PATH", out_path)
+    code = ex.main(argv or [])
+    return code, json.loads(out_path.read_text(encoding="utf-8"))
+
+
+def gemini_file(analysis: dict) -> dict:
+    template = ex.build_template(analysis)
+    payload, reasons = ex.rewrite_with_llm(analysis, template, fake_call(good_rewrite(template)))
+    assert not reasons
+    return {"contract_version": "1.0", "generated_at": "2026-11-15T09:00:00Z", "is_mock": analysis["is_mock"], **payload}
+
+
+def test_build_keeps_valid_gemini_file(tmp_path, monkeypatch):
+    analysis = load("no_trend")
+    existing = gemini_file(analysis)
+    code, written = _run_main(tmp_path, monkeypatch, analysis, existing)
+    assert code == 0
+    assert written == existing
+
+
+def test_build_replaces_gemini_file_when_analysis_changed(tmp_path, monkeypatch):
+    existing = gemini_file(load("no_trend"))
+    code, written = _run_main(tmp_path, monkeypatch, load("increase"), existing)
+    assert code == 0
+    assert written["source"] == "template"
+
+
+def test_build_replaces_gemini_file_when_mock_flag_changed(tmp_path, monkeypatch):
+    analysis = load("no_trend")
+    existing = gemini_file(analysis)
+    analysis["is_mock"] = False
+    _, written = _run_main(tmp_path, monkeypatch, analysis, existing)
+    assert written["source"] == "template" and written["is_mock"] is False
+
+
+def test_build_overwrites_old_template(tmp_path, monkeypatch):
+    analysis = load("decrease")
+    old = {"contract_version": "1.0", "generated_at": "2026-11-14T00:00:00Z", "is_mock": True,
+           "source": "template", "model": None, "checks_passed": True,
+           **ex.build_template(load("increase"))}
+    _, written = _run_main(tmp_path, monkeypatch, analysis, old)
+    assert written["summary"] == ex.build_template(analysis)["summary"]
+
+
+def test_llm_flag_without_key_writes_template(tmp_path, monkeypatch):
+    monkeypatch.setattr(ex, "_gemini_settings", lambda: ("", ex.DEFAULT_MODEL))
+    code, written = _run_main(tmp_path, monkeypatch, load("no_trend"), argv=["--llm"])
+    assert code == 0 and written["source"] == "template"
+
+
+def test_llm_flag_with_fake_model(tmp_path, monkeypatch):
+    analysis = load("no_trend")
+    template = ex.build_template(analysis)
+    monkeypatch.setattr(ex, "_gemini_settings", lambda: ("fake-key", "gemini-test-flash"))
+    monkeypatch.setattr(ex, "_make_caller", lambda key, model: fake_call(good_rewrite(template), model))
+    code, written = _run_main(tmp_path, monkeypatch, analysis, argv=["--llm"])
+    assert code == 0
+    assert written["source"] == "gemini" and written["model"] == "gemini-test-flash"
+    assert not list(Draft202012Validator(SCHEMA).iter_errors(written))
+
+
+def test_eval_without_llm_prints_table(capsys):
+    assert ex.main(["--eval"]) == 0
+    out = capsys.readouterr().out
+    for case in CASES:
+        assert f"| {case} | template |" in out
+
+
+# ------------------------------------------------------------ retries on busy errors
+
+
+class FakeApiError(Exception):
+    def __init__(self, code):
+        super().__init__(f"error {code}")
+        self.code = code
+
+
+def test_retry_succeeds_after_busy_errors():
+    calls, waits = [], []
+
+    def fn():
+        calls.append(1)
+        if len(calls) < 3:
+            raise FakeApiError(503)
+        return "ok"
+
+    assert ex.with_retries(fn, waits=[1, 2, 3], sleep=waits.append) == "ok"
+    assert waits == [1, 2]
+
+
+def test_retry_gives_up_after_last_wait():
+    def fn():
+        raise FakeApiError(503)
+
+    with pytest.raises(FakeApiError):
+        ex.with_retries(fn, waits=[1, 2], sleep=lambda s: None)
+
+
+@pytest.mark.parametrize("code", [400, 401, 403, 404, None])
+def test_no_retry_on_other_errors(code):
+    waits = []
+
+    def fn():
+        raise FakeApiError(code)
+
+    with pytest.raises(FakeApiError):
+        ex.with_retries(fn, waits=[1, 2], sleep=waits.append)
+    assert waits == []
