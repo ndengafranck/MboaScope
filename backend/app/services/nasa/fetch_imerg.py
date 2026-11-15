@@ -31,6 +31,21 @@ GROUP = "Grid"
 VARIABLE = "precipitation"
 
 
+def login() -> None:
+    """Log in to NASA Earthdata from EARTHDATA_USERNAME / EARTHDATA_PASSWORD (loaded from .env)."""
+    import os
+
+    import earthaccess
+
+    missing = [k for k in ("EARTHDATA_USERNAME", "EARTHDATA_PASSWORD") if not os.environ.get(k)]
+    if missing and not os.environ.get("EARTHDATA_TOKEN"):
+        raise SystemExit(
+            f"{' and '.join(missing)} not set. Put them in the .env file at the repository root "
+            "(next to README.md), not in backend/."
+        )
+    earthaccess.login(strategy="environment")
+
+
 def _union_bbox(regions: list[Region]) -> tuple[float, float, float, float]:
     """(west, south, east, north), the order earthaccess expects."""
     bounds = [r.grid_bounds for r in regions]
@@ -46,6 +61,21 @@ def _month_of(granule_name: str) -> str:
     """'3B-MO.MS.MRG.3IMERG.20010101-S000000-E235959.01.V07B.HDF5' -> '2001-01'."""
     stamp = granule_name.split(".3IMERG.")[1][:8]
     return f"{stamp[:4]}-{stamp[4:6]}"
+
+
+def _name_of(granule) -> str:
+    return granule.data_links()[0].rsplit("/", 1)[-1]
+
+
+def one_per_month(results: list) -> list:
+    """Keep one granule per month. If a month appears twice (V07A and V07B), keep the later version."""
+    best: dict[str, object] = {}
+    for granule in results:
+        name = _name_of(granule)
+        month = _month_of(name)
+        if month not in best or name > _name_of(best[month]):
+            best[month] = granule
+    return [best[m] for m in sorted(best)]
 
 
 def read_cells(handle, regions: list[Region]) -> tuple[dict[str, pd.DataFrame], str]:
@@ -79,13 +109,14 @@ def fetch(
 
     regions_all = load_regions()
     regions = [regions_all[r] for r in (region_ids or list(regions_all))]
-    earthaccess.login(strategy="environment")
+    login()
     results = earthaccess.search_data(
         short_name=DATASET["short_name"],
         version=DATASET["version"],
         temporal=(f"{start}-01", f"{end}-28"),
         bounding_box=_union_bbox(regions),
     )
+    results = one_per_month(results)
     if limit:
         results = results[:limit]
     print(f"fetch-imerg: {len(results)} granules for {', '.join(r.id for r in regions)}")
@@ -94,7 +125,7 @@ def fetch(
     names: list[str] = []
     units_seen: set[str] = set()
     for granule, handle in zip(results, earthaccess.open(results)):
-        name = granule.data_links()[0].rsplit("/", 1)[-1]
+        name = _name_of(granule)
         month = _month_of(name)
         cells, units = read_cells(handle, regions)
         units_seen.add(units)

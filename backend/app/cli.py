@@ -40,6 +40,12 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("status")
     args = parser.parse_args(argv)
 
+    # Load .env from the repository root before any command that needs
+    # EARTHDATA_* or GEMINI_* variables (earthaccess reads os.environ directly).
+    from app.core.config import get_settings
+
+    get_settings()
+
     if args.cmd == "seed-mock":
         from app.services.nasa import mock
 

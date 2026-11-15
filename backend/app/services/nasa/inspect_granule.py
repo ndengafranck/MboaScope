@@ -15,7 +15,9 @@ def inspect(month: str = f"{END_YEAR}-12") -> None:
     import earthaccess
     import xarray as xr
 
-    earthaccess.login(strategy="environment")
+    from app.services.nasa.fetch_imerg import login
+
+    login()
     results = earthaccess.search_data(
         short_name=DATASET["short_name"], version=DATASET["version"], temporal=(f"{month}-01", f"{month}-28")
     )
