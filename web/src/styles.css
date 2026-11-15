@@ -1560,7 +1560,7 @@ a:hover {
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
   color: var(--text-2);
 }
@@ -1806,4 +1806,11 @@ a:hover {
   .footer-inner {
     grid-template-columns: 1.2fr 1fr 1fr;
   }
+}
+
+/* Text alternative under the chart (guide 1.9): visible, same size as notes */
+.chart-alt {
+  font-size: 13px;
+  color: var(--text-2);
+  padding: 0 2px;
 }

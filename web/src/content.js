@@ -75,7 +75,7 @@ export const content = {
     original: 'Mann-Kendall',
     hamed_rao: 'Mann-Kendall, Hamed-Rao modified (corrects for year-to-year memory)',
   },
-  answerScope: (boxLabel) => `Satellite estimate averaged over the ${boxLabel}, not a rain gauge reading.`,
+  answerScope: (boxLabel) => `Satellite estimate averaged over the ${boxLabel}, not a reading at one spot on the ground.`,
   pettittStep: (year, p) =>
     `A step change test points to ${year} as the most likely break (p = ${p}).`,
   pettittSensor: 'It coincides with the satellite transition and may be an artifact.',
@@ -90,10 +90,10 @@ export const content = {
   chartMarkerShort: 'Satellite change',
   chartMarkerNote: (year) =>
     `The satellite constellation behind IMERG changed in ${year} (TRMM to GPM). A jump at that point can look like a trend without being one.`,
-  chartExcluded: (years) => `Years left out because months are missing: ${years}. They appear as gaps, never filled in.`,
+  chartExcluded: (years) => `Years left out because data was incomplete: ${years}. They appear as gaps, never filled in.`,
   chartNoExcluded: 'No year is missing data.',
   chartAlt: (verdict, first, last, slope, lo, hi) =>
-    `Bar chart of annual rainfall from ${first} to ${last}. ${verdict} Estimated change ${slope} mm per year (95% confidence interval ${lo} to ${hi}).`,
+    `Chart: yearly rainfall totals from ${first} to ${last} with the estimated trend line. ${verdict} Estimated change ${slope} mm per year (95% CI ${lo} to ${hi}).`,
   tooltipTotal: 'Total',
   chartTableToggle: 'Show the yearly numbers',
   chartTableYear: 'Year',
@@ -122,10 +122,10 @@ export const content = {
   // 6. Robustness
   robustHeading: 'Does the answer depend on choices?',
   robustIntro:
-    'We repeated the test with other box sizes and datasets. These rows only check robustness: the headline is fixed in advance and never swapped.',
+    'Other box sizes and a second dataset, to check the headline does not depend on one choice. The headline is fixed in advance and never swapped.',
   robustCols: ['Box', 'Dataset', 'Years', "Slope (mm/yr)", '95% interval', 'p', 'Result'],
   robustHeadlineTag: 'headline',
-  robustEmpty: 'No sensitivity rows in this run.',
+  robustEmpty: 'No robustness rows for this data source.',
 
   // 7. Explanation
   explainHeading: 'In plain words',
