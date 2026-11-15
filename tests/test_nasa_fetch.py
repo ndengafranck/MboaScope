@@ -69,6 +69,15 @@ def fake_earthaccess(tmp_path, monkeypatch):
 
     fake.search_data = search_data
     fake.open = lambda results: paths[: len(results)]
+    by_name = dict(zip(names, paths))
+
+    def download(granules, local_path):
+        import shutil
+
+        fake.calls.setdefault("downloaded", []).extend(g.name for g in granules)
+        return [shutil.copy(by_name[g.name], local_path) for g in granules]
+
+    fake.download = download
     monkeypatch.setitem(sys.modules, "earthaccess", fake)
     monkeypatch.setenv("EARTHDATA_USERNAME", "test-user")
     monkeypatch.setenv("EARTHDATA_PASSWORD", "test-pass")
@@ -126,3 +135,20 @@ def test_fill_value_is_dropped_not_stored(tmp_path):
     assert units == "mm/hr"
     assert len(df) == 80
     assert not ((df["lat"] == 4.05) & (df["lon"] == 9.75)).any()
+
+
+def test_download_mode_reads_local_files_and_resumes(tmp_db, fake_earthaccess, tmp_path, monkeypatch):
+    monkeypatch.setattr(fetch_imerg, "DOWNLOAD_DIR", tmp_path / "raw" / "imerg")
+    assert fetch_imerg.fetch(["douala"], download=True) == {"douala": 162}
+    assert len(fake_earthaccess.calls["downloaded"]) == 2
+    fetch_imerg.fetch(["douala"], download=True)  # second run: nothing to download
+    assert len(fake_earthaccess.calls["downloaded"]) == 2
+
+
+def test_forbidden_gives_the_authorize_instruction():
+    class Forbidden(Exception):
+        status = 403
+
+    with pytest.raises(SystemExit, match="NASA GESDISC DATA ARCHIVE"):
+        fetch_imerg.explain_http_error(Forbidden("403, message='Forbidden'"))
+    fetch_imerg.explain_http_error(ValueError("something else"))  # other errors pass through

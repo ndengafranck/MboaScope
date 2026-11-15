@@ -23,12 +23,55 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from app.core.config import DATASET, END_YEAR, START_YEAR
+from app.core.config import DATASET, END_YEAR, RAW_DIR, START_YEAR
 from app.models import database as db
 from app.services.gis.regions import Region, load_regions
 
 GROUP = "Grid"
 VARIABLE = "precipitation"
+DOWNLOAD_DIR = RAW_DIR / "imerg"
+
+FORBIDDEN_HINT = (
+    "NASA refused the file (HTTP 403). Your login works, but your Earthdata account has not "
+    "approved the GES DISC archive yet. Go to https://urs.earthdata.nasa.gov, open "
+    "Applications > Authorized Apps, click APPROVE MORE APPLICATIONS, approve "
+    "'NASA GESDISC DATA ARCHIVE', wait a minute, then run the command again. "
+    "If it still fails, add --download."
+)
+
+
+def explain_http_error(err: Exception) -> None:
+    """Turn a 401/403 from the NASA file server into a readable instruction."""
+    status = getattr(err, "status", None) or getattr(getattr(err, "response", None), "status_code", None)
+    if status in (401, 403) or "403" in str(err) or "Forbidden" in str(err):
+        raise SystemExit(FORBIDDEN_HINT) from err
+
+
+def open_granules(results: list, download: bool = False) -> list:
+    """File handles for the granules.
+
+    Default: stream them (only the Cameroon part is transferred).
+    download=True: save whole files in data/raw/imerg/ and read them locally. Files already
+    there are skipped, so an interrupted run resumes where it stopped.
+    """
+    import earthaccess
+
+    if not download:
+        return earthaccess.open(results)
+    DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    todo = [g for g in results if not (DOWNLOAD_DIR / _name_of(g)).exists()]
+    if todo:
+        print(f"download: {len(todo)} files to {DOWNLOAD_DIR} ({len(results) - len(todo)} already there)")
+        try:
+            earthaccess.download(todo, local_path=str(DOWNLOAD_DIR))
+        except Exception as err:
+            explain_http_error(err)
+            raise
+    missing = [_name_of(g) for g in results if not (DOWNLOAD_DIR / _name_of(g)).exists()]
+    if missing:
+        raise SystemExit(f"download incomplete, missing {len(missing)} files (first: {missing[0]}). "
+                         "Run the same command again to resume. " + FORBIDDEN_HINT)
+    return [str(DOWNLOAD_DIR / _name_of(g)) for g in results]
 
 
 def login() -> None:
@@ -104,6 +147,7 @@ def fetch(
     end: str = f"{END_YEAR}-12",
     limit: int | None = None,
     db_path: Path | None = None,
+    download: bool = False,
 ) -> dict[str, int]:
     import earthaccess
 
@@ -124,10 +168,14 @@ def fetch(
     frames: dict[str, list[pd.DataFrame]] = {r.id: [] for r in regions}
     names: list[str] = []
     units_seen: set[str] = set()
-    for granule, handle in zip(results, earthaccess.open(results)):
+    for granule, handle in zip(results, open_granules(results, download)):
         name = _name_of(granule)
         month = _month_of(name)
-        cells, units = read_cells(handle, regions)
+        try:
+            cells, units = read_cells(handle, regions)
+        except Exception as err:
+            explain_http_error(err)
+            raise
         units_seen.add(units)
         names.append(name)
         for rid, df in cells.items():

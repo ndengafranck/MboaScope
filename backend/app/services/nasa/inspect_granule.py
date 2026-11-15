@@ -11,11 +11,11 @@ from __future__ import annotations
 from app.core.config import DATASET, END_YEAR
 
 
-def inspect(month: str = f"{END_YEAR}-12") -> None:
+def inspect(month: str = f"{END_YEAR}-12", download: bool = False) -> None:
     import earthaccess
     import xarray as xr
 
-    from app.services.nasa.fetch_imerg import login
+    from app.services.nasa.fetch_imerg import explain_http_error, login, open_granules
 
     login()
     results = earthaccess.search_data(
@@ -28,8 +28,12 @@ def inspect(month: str = f"{END_YEAR}-12") -> None:
         )
         return
     print("inspect: granule", results[0].data_links()[0])
-    handle = earthaccess.open(results[:1])[0]
-    ds = xr.open_dataset(handle, group="Grid", engine="h5netcdf")
+    handle = open_granules(results[:1], download)[0]
+    try:
+        ds = xr.open_dataset(handle, group="Grid", engine="h5netcdf")
+    except Exception as err:
+        explain_http_error(err)
+        raise
     print(ds)
     da = ds["precipitation"]
     print("dims:", da.dims, "units:", da.attrs.get("units"), "fill:", da.attrs.get("_FillValue"))
