@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { content } from '../content.js'
 import { boxLabel, num, signed } from '../lib/format.js'
+import { IconInfo, IconMap } from './icons.jsx'
 import { Section } from './section.jsx'
 
 // Leaflet is loaded as its own chunk, only when this section renders.
@@ -13,6 +14,8 @@ export default function TrendMap({ spatial, annual, analysis }) {
     <Section
       id="map"
       title={content.mapHeading}
+      subtitle={annual.data ? content.mapIntro(boxLabel(annual.data, analysis.data?.headline?.box ?? 'box_3x3')) : null}
+      icon={IconMap}
       files={[
         ['spatial', spatial],
         ['annual', annual],
@@ -33,11 +36,13 @@ function MapBody({ s, annual, headlineBox }) {
 
   return (
     <>
-      <p className="section-intro">{content.mapIntro(boxLabel(annual, headlineBox))}</p>
       {s.available ? (
-        <p className="exploratory" role="note">
-          <strong>{content.mapExploratory(num(s.n_cells), num(s.expected_false_positives))}</strong>{' '}
-          {s.n_significant > 0 ? content.mapSignificant(num(s.n_significant)) : content.mapNoneSignificant}
+        <p className="callout" role="note">
+          <IconInfo size={18} />
+          <span>
+            <strong>{content.mapExploratory(num(s.n_cells), num(s.expected_false_positives))}</strong>{' '}
+            {s.n_significant > 0 ? content.mapSignificant(num(s.n_significant)) : content.mapNoneSignificant}
+          </span>
         </p>
       ) : (
         <p className="state">{content.mapUnavailable}</p>

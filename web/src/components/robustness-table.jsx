@@ -1,11 +1,18 @@
 import { content } from '../content.js'
 import { VERDICT_CLASS, boxLabel, num, pValue, signed } from '../lib/format.js'
+import { IconLayers } from './icons.jsx'
 import { Section } from './section.jsx'
 
 // Section 6. The headline row first, then the sensitivity rows from analysis.json.
 export default function RobustnessTable({ analysis, annual }) {
   return (
-    <Section id="robustness" title={content.robustHeading} files={[['analysis', analysis]]}>
+    <Section
+      id="robustness"
+      title={content.robustHeading}
+      subtitle={content.robustIntro}
+      icon={IconLayers}
+      files={[['analysis', analysis]]}
+    >
       {analysis.data && <TableBody a={analysis.data} annual={annual.data} />}
     </Section>
   )
@@ -32,7 +39,6 @@ function TableBody({ a, annual }) {
 
   return (
     <>
-      <p className="section-intro">{content.robustIntro}</p>
       <div className="table-scroll" tabIndex={0} role="region" aria-labelledby="robustness-title">
         <table className="robust">
           <thead>
