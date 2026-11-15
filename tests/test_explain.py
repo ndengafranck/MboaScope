@@ -489,3 +489,45 @@ def test_eval_without_llm_prints_table(capsys):
     out = capsys.readouterr().out
     for case in CASES:
         assert f"| {case} | template |" in out
+
+
+# ------------------------------------------------------------ retries on busy errors
+
+
+class FakeApiError(Exception):
+    def __init__(self, code):
+        super().__init__(f"error {code}")
+        self.code = code
+
+
+def test_retry_succeeds_after_busy_errors():
+    calls, waits = [], []
+
+    def fn():
+        calls.append(1)
+        if len(calls) < 3:
+            raise FakeApiError(503)
+        return "ok"
+
+    assert ex.with_retries(fn, waits=[1, 2, 3], sleep=waits.append) == "ok"
+    assert waits == [1, 2]
+
+
+def test_retry_gives_up_after_last_wait():
+    def fn():
+        raise FakeApiError(503)
+
+    with pytest.raises(FakeApiError):
+        ex.with_retries(fn, waits=[1, 2], sleep=lambda s: None)
+
+
+@pytest.mark.parametrize("code", [400, 401, 403, 404, None])
+def test_no_retry_on_other_errors(code):
+    waits = []
+
+    def fn():
+        raise FakeApiError(code)
+
+    with pytest.raises(FakeApiError):
+        ex.with_retries(fn, waits=[1, 2], sleep=waits.append)
+    assert waits == []

@@ -450,6 +450,28 @@ def pick_flash_model(names: Iterable[str]) -> str | None:
     return max(candidates, key=version)
 
 
+RETRY_CODES = (429, 500, 503, 504)
+RETRY_WAITS = (5, 15, 30, 60)  # seconds before each new attempt
+EVAL_PAUSE = 4  # seconds between eval cases, to stay under free-tier limits
+
+
+def with_retries(fn: Any, waits: Iterable[float] = RETRY_WAITS, sleep: Any = None) -> Any:
+    """Call fn(); on a busy or rate-limit error (429, 5xx), wait and try again."""
+    import time
+
+    sleep = sleep or time.sleep
+    waits = list(waits)
+    for attempt in range(len(waits) + 1):
+        try:
+            return fn()
+        except Exception as err:
+            code = getattr(err, "code", None)
+            if code not in RETRY_CODES or attempt == len(waits):
+                raise
+            print(f"explain: gemini busy ({code}), retrying in {waits[attempt]} s", file=sys.stderr)
+            sleep(waits[attempt])
+
+
 def call_gemini(prompt: str, model: str, api_key: str) -> tuple[str, str]:
     """Send the prompt to Gemini. Returns (answer text, model name used)."""
     from google import genai  # imported here so CI and the template never need it
@@ -459,8 +481,11 @@ def call_gemini(prompt: str, model: str, api_key: str) -> tuple[str, str]:
     config = types.GenerateContentConfig(temperature=TEMPERATURE, response_mime_type="application/json")
 
     def generate(name: str) -> tuple[str, str]:
-        response = client.models.generate_content(model=name, contents=prompt, config=config)
-        return response.text or "", response.model_version or name
+        def once() -> tuple[str, str]:
+            response = client.models.generate_content(model=name, contents=prompt, config=config)
+            return response.text or "", response.model_version or name
+
+        return with_retries(once)
 
     try:
         return generate(model)
@@ -557,7 +582,11 @@ def run_eval(use_llm: bool) -> int:
         return 1
     call = _make_caller(api_key, model) if use_llm else None
     rows, details = [], []
-    for case in EVAL_CASES:
+    import time
+
+    for index, case in enumerate(EVAL_CASES):
+        if use_llm and index:
+            time.sleep(EVAL_PAUSE)
         analysis = read_json(FIXTURES / f"analysis_{case}.json")
         payload, problems = explain(analysis)
         why = "; ".join(problems)
