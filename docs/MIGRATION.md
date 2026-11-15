@@ -12,7 +12,7 @@ on moved files). This page maps every old location to its new one.
 | `pipeline/import_giovanni.py` | `backend/app/services/nasa/giovanni.py` | `--region`, writes to SQLite |
 | `pipeline/fetch_imerg.py` (stub) | `backend/app/services/nasa/fetch_imerg.py` | first implementation, untested (task A1) |
 | `pipeline/inspect_granule.py` (stub) | `backend/app/services/nasa/inspect_granule.py` | first implementation, untested (task A1) |
-| `pipeline/fetch_gpcp.py` (stub) | `backend/app/services/nasa/fetch_gpcp.py` | still a stub (task A8) |
+| `pipeline/fetch_gpcp.py` (stub) | `backend/app/services/nasa/fetch_gpcp.py` | done (task A8): GPCP V3.3 sensitivity row |
 | `pipeline/config.py` | `backend/app/core/config.py` + `data/regions/cameroon_study_regions.json` + `services/gis/regions.py` | boxes are computed per region |
 | `pipeline/aggregate.py` | `backend/app/services/gis/spatial.py` | returns data frames instead of writing CSV/JSON |
 | `pipeline/stats.py` | `backend/app/services/analytics/stats.py` | **bug fix:** `mk_hamed_rao` ran the original test |
